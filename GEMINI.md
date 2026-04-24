@@ -5,39 +5,31 @@ Digital Vault is a full-stack digital wallet application designed for high-integ
 
 ### Architecture & Tech Stack
 - **Backend:** [NestJS](https://nestjs.com/) (TypeScript)
-  - **Database:** [TypeORM](https://typeorm.io/) with support for PostgreSQL (default) and SQLite.
+  - **Database:** [TypeORM](https://typeorm.io/) with SQLite.
   - **Validation:** `class-validator` and `class-transformer` for DTO validation.
   - **Features:** Transactional wallet operations (Credit/Debit), history tracking, and wallet management.
 - **Frontend:** [Next.js](https://nextjs.org/) (App Router, TypeScript)
   - **State Management:** [TanStack Query](https://tanstack.com/query) (React Query).
   - **Styling:** [Styled Components](https://styled-components.com/) and Vanilla CSS.
   - **Components:** Modular structure with a focus on responsiveness and interactive feedback.
-- **Infrastructure:** [Docker Compose](https://docs.docker.com/compose/) for PostgreSQL orchestration.
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
-- Docker & Docker Compose
 - npm or yarn
 
 ### Running the Project
 
-#### 1. Database
-Start the PostgreSQL database:
-```bash
-docker-compose up -d
-```
-
-#### 2. Backend
+#### 1. Backend
 ```bash
 cd backend
 npm install
 npm run start:dev
 ```
-The backend API will be available at `http://localhost:3001`.
+The backend API will be available at `http://localhost:3001`. The SQLite database will be created automatically as `backend/database.sqlite`.
 
-#### 3. Frontend
+#### 2. Frontend
 ```bash
 cd frontend
 npm install
@@ -73,4 +65,3 @@ The frontend application will be available at `http://localhost:3000`.
 - `backend/src/wallet/wallet.service.ts`: Core business logic for wallet operations.
 - `backend/src/wallet/entities/`: Database schema for Wallets and Transactions.
 - `frontend/src/lib/api.ts`: Centralized frontend API client.
-- `docker-compose.yml`: Database infrastructure configuration.

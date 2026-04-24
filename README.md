@@ -15,7 +15,7 @@ Digital Vault is a modern, high-integrity full-stack digital wallet application.
 ### 2. Transaction Integrity
 - **Credit (Deposit):** Add funds to any wallet instantly.
 - **Debit (Withdrawal):** Securely withdraw funds with automatic balance validation to prevent overdrafts.
-- **ACID Compliance:** The backend ensures that balance updates and transaction logging happen atomically.
+- **ACID Compliance:** The backend ensures that balance updates and transaction logging happen atomically using TypeORM transactions.
 
 ### 3. Categorization & Tracking
 - **Smart Categories:** Assign categories like *Groceries*, *Bills*, *Dining*, *Salary*, and more to your transactions.
@@ -25,42 +25,20 @@ Digital Vault is a modern, high-integrity full-stack digital wallet application.
 
 ---
 
-## 📸 High-Level Demo
-
-### Step 1: Initialize Your Vaults
-Upon opening the application, you'll land on the **Vault Dashboard**. Click on **"+ Create Wallet"** to initialize your first vault.
-> *Demo Tip: Give it a name like "Personal Vault" and start with an initial deposit.*
-
-### Step 2: Manage Your Funds
-Click on any wallet card to enter its **Control Center**. Here you can:
-- **Input an amount** in the dedicated field.
-- **Select an optional category** (e.g., 🍔 Dining or 💸 Salary).
-- Click **Credit** or **Debit** to perform the operation.
-
-### Step 3: Audit Your History
-Toggle the **"View Transaction History"** button at the bottom. This expands a detailed ledger showing:
-- Operation Type (Credit/Debit)
-- Exact Timestamp
-- Assigned Category
-- Specific Amount (color-coded: Green for Credit, Red for Debit)
-
----
-
 ## 🛠 Tech Stack
 
 - **Frontend:** Next.js 15, React 19, Styled Components, TanStack Query.
 - **Backend:** NestJS, TypeORM, class-validator.
-- **Database:** PostgreSQL (primary) / SQLite (optional).
-- **Environment:** Containerized with Docker.
+- **Database:** PostgreSQL (Primary) / SQLite (Development Toggle).
 
 ---
 
 ## 🚦 Getting Started
 
-### 1. Setup Infrastructure
-```bash
-docker-compose up -d
-```
+### 1. Database Setup
+The project uses **PostgreSQL** by default.
+- **Local (No Docker):** Ensure PostgreSQL is installed and running (`brew install postgresql@15`).
+- **Local (Docker):** Use the provided `docker-compose.yml` if Docker is installed.
 
 ### 2. Run Backend
 ```bash
@@ -76,7 +54,30 @@ npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000` to start your Digital Vault experience.
+---
+
+## 🔄 Database Toggle (Local Dev)
+To switch to **SQLite** for quick local development without needing a PostgreSQL server:
+```bash
+cd backend && DB_TYPE=sqlite npm run start:dev
+```
+This will create a local `database.sqlite` file in the backend directory.
+
+---
+
+## 🌐 Production & Live Hosting
+When deploying this project to the internet (e.g., Vercel, Render, Railway), configure the following environment variables in your hosting provider:
+
+| Variable | Description | Example |
+| :--- | :--- | :--- |
+| `DB_HOST` | Database Hostname | `your-db-instance.amazonaws.com` |
+| `DB_PORT` | Database Port | `5432` |
+| `DB_USERNAME` | Database User | `admin` |
+| `DB_PASSWORD` | Database Password | `your-secure-password` |
+| `DB_NAME` | Database Name | `wallet_prod` |
+| `NODE_ENV` | Environment Mode | `production` |
+
+*Note: In production mode, `synchronize` is automatically disabled to protect your data schema.*
 
 ---
 

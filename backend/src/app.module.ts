@@ -10,13 +10,15 @@ import { AppService } from './app.service';
   imports: [
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE === 'sqlite' ? 'sqlite' : 'postgres',
-      database: process.env.DB_TYPE === 'sqlite' ? 'database.sqlite' : 'wallet_db',
-      host: 'localhost',
-      port: 5432,
-      username: 'user',
-      password: 'password',
+      database: process.env.DB_TYPE === 'sqlite' ? 'database.sqlite' : process.env.DB_NAME || 'wallet_db',
+      ...(process.env.DB_TYPE !== 'sqlite' && {
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
+        username: process.env.DB_USERNAME || 'user',
+        password: process.env.DB_PASSWORD || 'password',
+      }),
       entities: [Wallet, Transaction],
-      synchronize: true, // Auto-create tables (for development)
+      synchronize: true, // Note: Set to false in production
     }),
     WalletModule,
   ],
