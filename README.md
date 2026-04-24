@@ -2,7 +2,7 @@
 
 Digital Vault is a modern, high-integrity full-stack digital wallet application. It provides a secure and intuitive interface for managing multiple wallets, tracking balances, and categorizing transactions.
 
-![Digital Vault Dashboard Placeholder](https://via.placeholder.com/800x400.png?text=Digital+Vault+Dashboard+Preview)
+![Digital Vault Dashboard](./assets/homePage.png)
 
 ## 🚀 Key Functionalities
 
