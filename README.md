@@ -30,15 +30,18 @@ Digital Vault is a modern, high-integrity full-stack digital wallet application.
 - **Frontend:** Next.js 15, React 19, Styled Components, TanStack Query.
 - **Backend:** NestJS, TypeORM, class-validator.
 - **Database:** PostgreSQL (Primary) / SQLite (Development Toggle).
+- **Infrastructure:** Docker Compose for containerized PostgreSQL orchestration.
 
 ---
 
 ## 🚦 Getting Started
 
-### 1. Database Setup
-The project uses **PostgreSQL** by default.
-- **Local (No Docker):** Ensure PostgreSQL is installed and running (`brew install postgresql@15`).
-- **Local (Docker):** Use the provided `docker-compose.yml` if Docker is installed.
+### 1. Database Setup (PostgreSQL)
+The project defaults to PostgreSQL. The recommended way to run it is via **Docker**:
+```bash
+docker compose up -d
+```
+*Alternatively, you can use local PostgreSQL via Homebrew (`brew services start postgresql@15`).*
 
 ### 2. Run Backend
 ```bash
@@ -57,7 +60,7 @@ npm run dev
 ---
 
 ## 🔄 Database Toggle (Local Dev)
-To switch to **SQLite** for quick local development without needing a PostgreSQL server:
+If you prefer not to use PostgreSQL/Docker, you can switch to **SQLite** instantly:
 ```bash
 cd backend && DB_TYPE=sqlite npm run start:dev
 ```
@@ -70,6 +73,7 @@ When deploying this project to the internet (e.g., Vercel, Render, Railway), con
 
 | Variable | Description | Example |
 | :--- | :--- | :--- |
+| `DB_TYPE` | Database Type | `postgres` |
 | `DB_HOST` | Database Hostname | `your-db-instance.amazonaws.com` |
 | `DB_PORT` | Database Port | `5432` |
 | `DB_USERNAME` | Database User | `admin` |

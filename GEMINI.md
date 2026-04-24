@@ -5,46 +5,55 @@ Digital Vault is a full-stack digital wallet application designed for high-integ
 
 ### Architecture & Tech Stack
 - **Backend:** [NestJS](https://nestjs.com/) (TypeScript)
-  - **Database:** [TypeORM](https://typeorm.io/) with SQLite.
+  - **Database:** [TypeORM](https://typeorm.io/) with dual support for **PostgreSQL** (Default) and **SQLite** (Dev Toggle).
   - **Validation:** `class-validator` and `class-transformer` for DTO validation.
   - **Features:** Transactional wallet operations (Credit/Debit), history tracking, and wallet management.
 - **Frontend:** [Next.js](https://nextjs.org/) (App Router, TypeScript)
   - **State Management:** [TanStack Query](https://tanstack.com/query) (React Query).
   - **Styling:** [Styled Components](https://styled-components.com/) and Vanilla CSS.
-  - **Components:** Modular structure with a focus on responsiveness and interactive feedback.
+  - **Infrastructure:** [Docker Compose](https://docs.docker.com/compose/) for containerized PostgreSQL orchestration.
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
+- Docker Desktop (Recommended for PostgreSQL)
 - npm or yarn
 
 ### Running the Project
 
-#### 1. Backend
+#### 1. Database (PostgreSQL)
+The project defaults to PostgreSQL. Start the database using Docker:
+```bash
+docker compose up -d
+```
+*Alternatively, if using local PostgreSQL via Homebrew:* `brew services start postgresql@15`
+
+#### 2. Backend
 ```bash
 cd backend
 npm install
 npm run start:dev
 ```
-The backend API will be available at `http://localhost:3001`. The SQLite database will be created automatically as `backend/database.sqlite`.
+**SQLite Toggle:** To run without PostgreSQL, use: `DB_TYPE=sqlite npm run start:dev`
 
-#### 2. Frontend
+#### 3. Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The frontend application will be available at `http://localhost:3000`.
 
 ## Development Conventions
 
 ### Backend
 - **Modules:** Organized by feature (e.g., `wallet` module).
-- **Entities:** Located in `src/feature/entities/`.
-- **DTOs:** Located in `src/feature/dto/` for request/response validation.
+- **Entities:** Located in `src/wallet/entities/`.
+- **DTOs:** Located in `src/wallet/dto/` for request/response validation.
 - **Transactions:** Use TypeORM `QueryRunner` for atomic operations involving balance updates and transaction logging.
-- **CORS:** Enabled globally in `main.ts` to allow frontend communication.
+- **Environment Variables:**
+  - `DB_TYPE`: `postgres` or `sqlite`
+  - `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME` (For PostgreSQL)
 
 ### Frontend
 - **App Router:** Uses the Next.js App Router pattern (`src/app/`).
@@ -62,6 +71,8 @@ The frontend application will be available at `http://localhost:3000`.
 - `GET /:id/history`: Get transaction history (paginated).
 
 ## Key Files
+- `backend/src/app.module.ts`: Database connection logic and environment configuration.
 - `backend/src/wallet/wallet.service.ts`: Core business logic for wallet operations.
 - `backend/src/wallet/entities/`: Database schema for Wallets and Transactions.
 - `frontend/src/lib/api.ts`: Centralized frontend API client.
+- `docker-compose.yml`: Local infrastructure definition.
