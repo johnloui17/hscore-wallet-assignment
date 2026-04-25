@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WalletModule } from './wallet/wallet.module';
 import { Wallet } from './wallet/entities/wallet.entity';
@@ -8,6 +9,9 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE === 'sqlite' ? 'sqlite' : 'postgres',
       database: process.env.DB_TYPE === 'sqlite' ? 'database.sqlite' : process.env.DB_NAME || 'wallet_db',
@@ -18,7 +22,7 @@ import { AppService } from './app.service';
         password: process.env.DB_PASSWORD || 'password',
       }),
       entities: [Wallet, Transaction],
-      synchronize: true, // Note: Set to false in production
+      synchronize: process.env.NODE_ENV !== 'production', // Safe for live
     }),
     WalletModule,
   ],
