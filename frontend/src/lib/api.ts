@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3001/api/v1/wallet';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1/wallet';
 
 export async function createWallet(name: string, initialBalance: number = 0) {
   const res = await fetch(BASE_URL, { 
