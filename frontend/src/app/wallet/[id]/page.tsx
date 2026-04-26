@@ -20,7 +20,6 @@ import {
   Briefcase, 
   Loader2, 
   Calendar, 
-  Wallet, 
   History as HistoryIcon, 
   CheckCircle2, 
   X,
@@ -30,6 +29,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { deleteWalletAction } from '@/app/actions';
+
+interface TransactionData {
+  id: string;
+  type: 'CREDIT' | 'DEBIT';
+  amount: number | string;
+  description?: string;
+  created_at: string;
+  category?: string;
+}
 
 /* ── Styled Components ── */
 const Page = styled.div`
@@ -609,7 +617,10 @@ export default function WalletDetails() {
       });
       resetForm();
     },
-    onError: () => toast.error('Failed to process credit'),
+    onError: (err) => {
+      const message = err instanceof Error ? err.message : 'Failed to process credit';
+      toast.error(message);
+    }
   });
 
   const debitMutation = useMutation({
@@ -623,7 +634,10 @@ export default function WalletDetails() {
       });
       resetForm();
     },
-    onError: (err: any) => toast.error(err.message || 'Failed to process debit'),
+    onError: (err) => {
+      const message = err instanceof Error ? err.message : 'Failed to process debit';
+      toast.error(message);
+    }
   });
 
   const resetForm = () => {
@@ -653,7 +667,8 @@ export default function WalletDetails() {
         setIsDeleting(false);
       }
     } catch (error) {
-      toast.error('An error occurred while deleting the wallet');
+      const message = error instanceof Error ? error.message : 'An error occurred while deleting the wallet';
+      toast.error(message);
       setIsDeleting(false);
     }
   };
@@ -672,7 +687,7 @@ export default function WalletDetails() {
   };
 
   const currentBalance = balanceData?.balance || 0;
-  const transactions = historyData?.transactions || [];
+  const transactions = (historyData?.transactions as TransactionData[]) || [];
   const totalTransactions = historyData?.total || 0;
   const totalPages = Math.ceil(totalTransactions / limit);
 
@@ -889,7 +904,7 @@ export default function WalletDetails() {
                     </p>
                   ) : (
                     <>
-                      {transactions.map((tx: any, idx: number) => (
+                      {transactions.map((tx: TransactionData, idx: number) => (
                         <TransactionRow
                           key={tx.id}
                           initial={{ opacity: 0, x: -10 }}

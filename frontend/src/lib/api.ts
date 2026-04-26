@@ -54,7 +54,7 @@ export async function getHistory(id: string, limit: number = 10, offset: number 
   return res.json();
 }
 
-export async function getAllActivity(params: Record<string, any>) {
+export async function getAllActivity(params: Record<string, string | number | string[] | undefined>) {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {

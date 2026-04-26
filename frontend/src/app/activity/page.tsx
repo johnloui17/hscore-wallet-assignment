@@ -7,7 +7,6 @@ import { getAllActivity, getAllWallets } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ChevronLeft, 
   TrendingUp, 
   TrendingDown,
   Calendar,
@@ -21,10 +20,26 @@ import {
   SlidersHorizontal,
   ArrowRight,
   Wallet,
-  Check,
-  X
+  Check
 } from 'lucide-react';
 import { BottomSheet } from '@/components/BottomSheet';
+
+interface WalletData {
+  id: string;
+  name: string;
+}
+
+interface TransactionData {
+  id: string;
+  type: 'CREDIT' | 'DEBIT';
+  amount: number | string;
+  description?: string;
+  created_at: string;
+  wallet_id: string;
+  wallet?: {
+    name: string;
+  };
+}
 
 /* ── Styled Components ── */
 const Page = styled.div`
@@ -483,7 +498,7 @@ export default function ActivityPage() {
           </div>
         ) : (
           <LedgerBox>
-            {transactions.map((tx: any, idx: number) => (
+            {transactions.map((tx: TransactionData, idx: number) => (
               <TransactionRow 
                 key={tx.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -586,7 +601,7 @@ export default function ActivityPage() {
           <SectionLabel>Wallet</SectionLabel>
           <PillGroup>
             <Pill $active={walletId === ''} onClick={() => setWalletId('')}>All Wallets</Pill>
-            {walletsData?.map((w: any) => (
+            {walletsData?.map((w: WalletData) => (
               <Pill 
                 key={w.id} 
                 $active={walletId === w.id} 

@@ -110,8 +110,14 @@ const ArrowWrapper = styled.div`
   flex-shrink: 0;
 `;
 
+interface WalletData {
+  id: string;
+  name: string;
+  balance: number | string;
+}
+
 interface WalletCarouselProps {
-  wallets: any[];
+  wallets: WalletData[];
 }
 
 export function WalletCarousel({ wallets }: WalletCarouselProps) {

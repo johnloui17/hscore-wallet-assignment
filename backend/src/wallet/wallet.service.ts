@@ -43,7 +43,19 @@ export class WalletService {
   }
 
   async getAllWallets(): Promise<Wallet[]> {
-    return this.walletRepository.find();
+    return this.walletRepository.find({
+      relations: ['transactions'],
+      order: { 
+        createdAt: 'DESC',
+        transactions: { created_at: 'DESC' }
+      },
+    }).then(wallets => {
+      // Limit transactions to last 10 for performance in dashboard
+      return wallets.map(w => ({
+        ...w,
+        transactions: w.transactions.slice(0, 10)
+      }));
+    });
   }
 
   async deleteWallet(id: string): Promise<void> {

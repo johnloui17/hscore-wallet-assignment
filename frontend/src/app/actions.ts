@@ -9,8 +9,9 @@ export async function createWalletAction(name: string, initialBalance: number) {
     revalidateTag('wallets', 'default');
     revalidateTag('all-activity', 'default');
     return { success: true, data: result };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create wallet' };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to create wallet';
+    return { success: false, error: message };
   }
 }
 
@@ -20,8 +21,9 @@ export async function deleteWalletAction(id: string) {
     revalidateTag('wallets', 'default');
     revalidateTag('all-activity', 'default');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete wallet' };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to delete wallet';
+    return { success: false, error: message };
   }
 }
 
@@ -34,8 +36,9 @@ export async function creditAction(id: string, amount: number, category?: string
     revalidateTag(`balance-${id}`, 'default');
     revalidateTag(`history-${id}`, 'default');
     return { success: true, data: result };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to credit wallet' };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to credit wallet';
+    return { success: false, error: message };
   }
 }
 
@@ -47,7 +50,8 @@ export async function debitAction(id: string, amount: number, category?: string,
     revalidateTag(`balance-${id}`, 'default');
     revalidateTag(`history-${id}`, 'default');
     return { success: true, data: result };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to debit wallet' };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to debit wallet';
+    return { success: false, error: message };
   }
 }

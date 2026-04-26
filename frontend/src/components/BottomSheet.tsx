@@ -13,7 +13,12 @@ const Overlay = styled(motion.div)`
   z-index: 100;
   display: flex;
   justify-content: center;
-  align-items: flex-end; /* Align to bottom */
+  align-items: flex-end; /* Mobile: Bottom */
+
+  @media (min-width: 1024px) {
+    align-items: center; /* Desktop: Center */
+    background: rgba(2, 6, 23, 0.4); /* Lighter for desktop glass feel */
+  }
 `;
 
 const SheetContent = styled.div`
@@ -26,7 +31,16 @@ const SheetContent = styled.div`
   padding: 32px 24px 48px 24px;
   box-shadow: 0 -25px 50px -12px rgba(0, 0, 0, 0.5);
   position: relative;
-  touch-action: none; /* Important for useDrag */
+  touch-action: none;
+
+  @media (min-width: 1024px) {
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 48px;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+    width: 500px;
+  }
 `;
 
 const HandleBar = styled.div`
@@ -40,6 +54,10 @@ const HandleBar = styled.div`
   &:active {
     cursor: grabbing;
   }
+
+  @media (min-width: 1024px) {
+    display: none; /* Hide on desktop modal */
+  }
 `;
 
 interface BottomSheetProps {
@@ -50,11 +68,13 @@ interface BottomSheetProps {
 
 export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
   const bind = useDrag(
-    ({ last, velocity: [, vy], movement: [, my], cancel, canceled }) => {
-      // If pulled down far enough or swiped down fast enough
-      if (my > 100 || (vy > 0.5 && my > 0)) {
-        cancel();
-        onClose();
+    ({ velocity: [, vy], movement: [, my], cancel }) => {
+      // Swipe down logic only on mobile-sized movement
+      if (window.innerWidth < 1024) {
+        if (my > 100 || (vy > 0.5 && my > 0)) {
+          cancel();
+          onClose();
+        }
       }
     },
     { from: () => [0, 0], filterTaps: true, bounds: { top: 0 }, rubberband: true }
@@ -71,9 +91,9 @@ export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
         >
           <motion.div
             {...(bind() as any)}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={{ y: '100%', opacity: 0, scale: 0.95 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: '100%', opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             onClick={(e) => e.stopPropagation()}
             style={{ width: '100%', display: 'flex', justifyContent: 'center' }}

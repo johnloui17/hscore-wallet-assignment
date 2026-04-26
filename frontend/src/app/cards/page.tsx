@@ -4,14 +4,11 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
-  ChevronLeft, 
   Home, 
   Activity as ActivityIcon, 
   CreditCard as CreditCardIcon, 
   Settings, 
   Plus,
-  Wifi,
-  Contact2,
   ShieldCheck,
   Zap
 } from 'lucide-react';
