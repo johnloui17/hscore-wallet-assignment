@@ -29,12 +29,12 @@ export class WalletController {
 
   @Post(':id/credit')
   async credit(@Param('id') id: string, @Body() transactDto: TransactDto) {
-    return this.walletService.credit(id, transactDto.amount, transactDto.category);
+    return this.walletService.credit(id, transactDto.amount, transactDto.category, transactDto.description);
   }
 
   @Post(':id/debit')
   async debit(@Param('id') id: string, @Body() transactDto: TransactDto) {
-    return this.walletService.debit(id, transactDto.amount, transactDto.category);
+    return this.walletService.debit(id, transactDto.amount, transactDto.category, transactDto.description);
   }
 
   @Get(':id/history')
@@ -44,5 +44,34 @@ export class WalletController {
     @Query('offset') offset = 0,
   ) {
     return this.walletService.getHistory(id, Number(limit), Number(offset));
+  }
+
+  @Get('transactions/all')
+  async getAllTransactions(
+    @Query('limit') limit = 10,
+    @Query('offset') offset = 0,
+    @Query('type') type?: string,
+    @Query('category') category?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('sortBy') sortBy: 'date' | 'amount' = 'date',
+    @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'DESC',
+    @Query('walletId') walletId?: string | string[],
+  ) {
+    const walletIds = Array.isArray(walletId) 
+      ? walletId 
+      : walletId ? walletId.split(',') : undefined;
+
+    return this.walletService.getAllTransactions(
+      Number(limit),
+      Number(offset),
+      type,
+      category,
+      startDate,
+      endDate,
+      sortBy,
+      sortOrder,
+      walletIds,
+    );
   }
 }

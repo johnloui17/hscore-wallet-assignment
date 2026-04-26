@@ -1,7 +1,7 @@
-# GEMINI.md - Digital Vault Project Context
+# GEMINI.md - Pocket Feel Project Context
 
 ## Project Overview
-Digital Vault is a full-stack digital wallet application designed for high-integrity transaction management. It features a monorepo structure with a NestJS backend and a Next.js frontend.
+Pocket Feel is a full-stack digital wallet application designed for high-integrity transaction management. It features a monorepo structure with a NestJS backend and a Next.js frontend.
 
 ### Architecture & Tech Stack
 - **Backend:** [NestJS](https://nestjs.com/) (TypeScript)

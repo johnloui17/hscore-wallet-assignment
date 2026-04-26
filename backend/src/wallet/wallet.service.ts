@@ -43,7 +43,19 @@ export class WalletService {
   }
 
   async getAllWallets(): Promise<Wallet[]> {
-    return this.walletRepository.find();
+    return this.walletRepository.find({
+      relations: ['transactions'],
+      order: { 
+        createdAt: 'DESC',
+        transactions: { created_at: 'DESC' }
+      },
+    }).then(wallets => {
+      // Limit transactions to last 10 for performance in dashboard
+      return wallets.map(w => ({
+        ...w,
+        transactions: w.transactions.slice(0, 10)
+      }));
+    });
   }
 
   async deleteWallet(id: string): Promise<void> {
@@ -59,7 +71,7 @@ export class WalletService {
     return wallet;
   }
 
-  async credit(id: string, amount: number, category?: string): Promise<Wallet> {
+  async credit(id: string, amount: number, category?: string, description?: string): Promise<Wallet> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -81,7 +93,8 @@ export class WalletService {
         wallet_id: id,
         amount,
         type: TransactionType.CREDIT,
-        category: category || undefined
+        category: category || undefined,
+        description: description || undefined
       });
 
       await queryRunner.manager.save(wallet);
@@ -97,7 +110,7 @@ export class WalletService {
     }
   }
 
-  async debit(id: string, amount: number, category?: string): Promise<Wallet> {
+  async debit(id: string, amount: number, category?: string, description?: string): Promise<Wallet> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -123,7 +136,8 @@ export class WalletService {
         wallet_id: id,
         amount,
         type: TransactionType.DEBIT,
-        category: category || undefined
+        category: category || undefined,
+        description: description || undefined
       });
 
       await queryRunner.manager.save(wallet);
@@ -146,6 +160,49 @@ export class WalletService {
       take: limit,
       skip: offset,
     });
+    return { transactions, total };
+  }
+
+  async getAllTransactions(
+    limit = 10,
+    offset = 0,
+    type?: string,
+    category?: string,
+    startDate?: string,
+    endDate?: string,
+    sortBy: 'date' | 'amount' = 'date',
+    sortOrder: 'ASC' | 'DESC' = 'DESC',
+    walletIds?: string[]
+  ): Promise<{ transactions: Transaction[], total: number }> {
+    const query = this.transactionRepository.createQueryBuilder('transaction')
+      .leftJoinAndSelect('transaction.wallet', 'wallet')
+      .take(limit)
+      .skip(offset);
+
+    if (walletIds && walletIds.length > 0) {
+      query.andWhere('transaction.wallet_id IN (:...walletIds)', { walletIds });
+    }
+
+    if (type) {
+      query.andWhere('transaction.type = :type', { type });
+    }
+
+    if (category) {
+      query.andWhere('transaction.category = :category', { category });
+    }
+
+    if (startDate) {
+      query.andWhere('transaction.created_at >= :startDate', { startDate });
+    }
+
+    if (endDate) {
+      query.andWhere('transaction.created_at <= :endDate', { endDate });
+    }
+
+    const orderField = sortBy === 'amount' ? 'transaction.amount' : 'transaction.created_at';
+    query.orderBy(orderField, sortOrder);
+
+    const [transactions, total] = await query.getManyAndCount();
     return { transactions, total };
   }
 }

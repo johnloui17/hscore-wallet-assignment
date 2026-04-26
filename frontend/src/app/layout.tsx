@@ -3,12 +3,13 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Providers from '@/lib/query-provider';
 import StyledComponentsRegistry from '@/lib/registry';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Digital Vault',
-  description: 'High-Integrity Digital Wallet',
+  title: 'Pocket Feel',
+  description: 'Your personal digital wallet',
 };
 
 export default function RootLayout({
@@ -17,11 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <StyledComponentsRegistry>
           <Providers>
             {children}
+            <Toaster position="top-right" richColors theme="dark" />
           </Providers>
         </StyledComponentsRegistry>
       </body>

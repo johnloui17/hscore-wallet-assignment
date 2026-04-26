@@ -8,4 +8,8 @@ export class TransactDto {
   @IsString()
   @IsOptional()
   category?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 }
