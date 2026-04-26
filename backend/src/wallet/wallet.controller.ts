@@ -29,12 +29,12 @@ export class WalletController {
 
   @Post(':id/credit')
   async credit(@Param('id') id: string, @Body() transactDto: TransactDto) {
-    return this.walletService.credit(id, transactDto.amount, transactDto.category);
+    return this.walletService.credit(id, transactDto.amount, transactDto.category, transactDto.description);
   }
 
   @Post(':id/debit')
   async debit(@Param('id') id: string, @Body() transactDto: TransactDto) {
-    return this.walletService.debit(id, transactDto.amount, transactDto.category);
+    return this.walletService.debit(id, transactDto.amount, transactDto.category, transactDto.description);
   }
 
   @Get(':id/history')

@@ -25,6 +25,9 @@ export class Transaction {
   @Column({ type: 'varchar', nullable: true })
   category?: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  description?: string;
+
   @CreateDateColumn()
   created_at: Date;
 

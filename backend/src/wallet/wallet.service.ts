@@ -59,7 +59,7 @@ export class WalletService {
     return wallet;
   }
 
-  async credit(id: string, amount: number, category?: string): Promise<Wallet> {
+  async credit(id: string, amount: number, category?: string, description?: string): Promise<Wallet> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -81,7 +81,8 @@ export class WalletService {
         wallet_id: id,
         amount,
         type: TransactionType.CREDIT,
-        category: category || undefined
+        category: category || undefined,
+        description: description || undefined
       });
 
       await queryRunner.manager.save(wallet);
@@ -97,7 +98,7 @@ export class WalletService {
     }
   }
 
-  async debit(id: string, amount: number, category?: string): Promise<Wallet> {
+  async debit(id: string, amount: number, category?: string, description?: string): Promise<Wallet> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -123,7 +124,8 @@ export class WalletService {
         wallet_id: id,
         amount,
         type: TransactionType.DEBIT,
-        category: category || undefined
+        category: category || undefined,
+        description: description || undefined
       });
 
       await queryRunner.manager.save(wallet);

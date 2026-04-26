@@ -27,21 +27,21 @@ export async function getBalance(id: string) {
   return res.json();
 }
 
-export async function credit(id: string, amount: number, category?: string) {
+export async function credit(id: string, amount: number, category?: string, description?: string) {
   const res = await fetch(`${BASE_URL}/${id}/credit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount, category }),
+    body: JSON.stringify({ amount, category, description }),
   });
   if (!res.ok) throw new Error('Failed to credit');
   return res.json();
 }
 
-export async function debit(id: string, amount: number, category?: string) {
+export async function debit(id: string, amount: number, category?: string, description?: string) {
   const res = await fetch(`${BASE_URL}/${id}/debit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount, category }),
+    body: JSON.stringify({ amount, category, description }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Failed to debit');

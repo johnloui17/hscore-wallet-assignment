@@ -23,9 +23,9 @@ import {
   Wallet, 
   History as HistoryIcon, 
   CheckCircle2, 
-  X 
+  X,
+  AlignLeft
 } from 'lucide-react';
-
 import { toast } from 'sonner';
 
 /* ── Styled Components ── */
@@ -146,30 +146,28 @@ const ChoiceCard = styled(motion.button)<{ $variant?: 'ledger' | 'credit' | 'deb
   background: rgba(30, 41, 59, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
-  padding: ${({ $fullWidth }) => $fullWidth ? '20px 24px' : '24px 16px'};
+  padding: ${({ $fullWidth }) => ($fullWidth ? '20px 24px' : '24px 16px')};
   display: flex;
-  flex-direction: ${({ $fullWidth }) => $fullWidth ? 'row' : 'column'};
+  flex-direction: ${({ $fullWidth }) => ($fullWidth ? 'row' : 'column')};
   align-items: center;
   justify-content: center;
-  gap: ${({ $fullWidth }) => $fullWidth ? '16px' : '12px'};
+  gap: ${({ $fullWidth }) => ($fullWidth ? '16px' : '12px')};
   cursor: pointer;
   color: #f1f5f9;
   transition: all 0.2s;
-  grid-column: ${({ $fullWidth }) => $fullWidth ? 'span 2' : 'auto'};
+  grid-column: ${({ $fullWidth }) => ($fullWidth ? 'span 2' : 'auto')};
 
   &:hover {
     background: rgba(30, 41, 59, 0.7);
-    border-color: ${({ $variant }) => 
-      $variant === 'credit' ? '#10b981' : 
-      $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+    border-color: ${({ $variant }) =>
+      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
   }
 
   svg {
-    color: ${({ $variant }) => 
-      $variant === 'credit' ? '#10b981' : 
-      $variant === 'debit' ? '#ef4444' : '#3b82f6'};
-    width: ${({ $fullWidth }) => $fullWidth ? '24px' : '32px'};
-    height: ${({ $fullWidth }) => $fullWidth ? '24px' : '32px'};
+    color: ${({ $variant }) =>
+      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+    width: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
+    height: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
   }
 `;
 
@@ -208,6 +206,16 @@ const CurrencySymbol = styled.span`
   font-weight: 700;
 `;
 
+const InputIcon = styled.span`
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+`;
+
 const Input = styled.input`
   width: 100%;
   background: rgba(30, 41, 59, 0.5);
@@ -231,6 +239,12 @@ const Input = styled.input`
   }
 `;
 
+const DescriptionInput = styled(Input)`
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 18px 20px 18px 48px;
+`;
+
 const SubmitButton = styled(motion.button)<{ $type: 'credit' | 'debit' }>`
   width: 100%;
   padding: 20px;
@@ -246,11 +260,14 @@ const SubmitButton = styled(motion.button)<{ $type: 'credit' | 'debit' }>`
   text-transform: uppercase;
   letter-spacing: 1px;
   
-  ${({ $type }) => $type === 'credit' ? `
+  ${({ $type }) =>
+    $type === 'credit'
+      ? `
     background: #10b981;
     color: white;
     box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.4);
-  ` : `
+  `
+      : `
     background: #ef4444;
     color: white;
     box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.4);
@@ -354,6 +371,13 @@ const TransTitle = styled.span`
   font-weight: 700;
   color: #f1f5f9;
   font-size: 1rem;
+`;
+
+const TransDesc = styled.p`
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 2px 0;
 `;
 
 const TransSub = styled.div`
@@ -482,17 +506,18 @@ export default function WalletDetails() {
   const params = useParams();
   const queryClient = useQueryClient();
   const walletId = params.id as string;
-  
+
   const [viewMode, setViewMode] = useState<'choice' | 'amount' | 'history'>('choice');
   const [txType, setTxType] = useState<'credit' | 'debit' | null>(null);
   const [amountInput, setAmountInput] = useState('');
+  const [descriptionInput, setDescriptionInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const limit = 4;
 
-  const [successModal, setSuccessModal] = useState<{ visible: boolean; message: string }>({ 
-    visible: false, 
-    message: '' 
+  const [successModal, setSuccessModal] = useState<{ visible: boolean; message: string }>({
+    visible: false,
+    message: '',
   });
 
   const categories = [
@@ -527,29 +552,36 @@ export default function WalletDetails() {
   }, [successModal.visible]);
 
   const creditMutation = useMutation({
-    mutationFn: (amount: number) => credit(walletId, amount, selectedCategory || undefined),
+    mutationFn: (amount: number) => credit(walletId, amount, selectedCategory || undefined, descriptionInput || undefined),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
-      setSuccessModal({ visible: true, message: `Successfully added ₹${Number(amountInput).toLocaleString('en-IN')}` });
+      setSuccessModal({
+        visible: true,
+        message: `Successfully added ₹${Number(amountInput).toLocaleString('en-IN')}`,
+      });
       resetForm();
     },
-    onError: () => toast.error("Failed to process credit")
+    onError: () => toast.error('Failed to process credit'),
   });
 
   const debitMutation = useMutation({
-    mutationFn: (amount: number) => debit(walletId, amount, selectedCategory || undefined),
+    mutationFn: (amount: number) => debit(walletId, amount, selectedCategory || undefined, descriptionInput || undefined),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
-      setSuccessModal({ visible: true, message: `Successfully withdrawn ₹${Number(amountInput).toLocaleString('en-IN')}` });
+      setSuccessModal({
+        visible: true,
+        message: `Successfully withdrawn ₹${Number(amountInput).toLocaleString('en-IN')}`,
+      });
       resetForm();
     },
-    onError: (err: any) => toast.error(err.message || "Failed to process debit")
+    onError: (err: any) => toast.error(err.message || 'Failed to process debit'),
   });
 
   const resetForm = () => {
     setAmountInput('');
+    setDescriptionInput('');
     setSelectedCategory(null);
     setTxType(null);
     setViewMode('choice');
@@ -585,10 +617,7 @@ export default function WalletDetails() {
     <Page>
       <ScrollArea>
         <HeaderRow>
-          <BackBtn 
-            whileHover={{ x: -4 }}
-            onClick={handleBack}
-          >
+          <BackBtn whileHover={{ x: -4 }} onClick={handleBack}>
             <ChevronLeft size={18} />
             {getBackLabel()}
           </BackBtn>
@@ -605,7 +634,7 @@ export default function WalletDetails() {
             {Number(currentBalance).toLocaleString('en-IN', {
               style: 'currency',
               currency: 'INR',
-              maximumFractionDigits: 0
+              maximumFractionDigits: 0,
             })}
           </BalanceAmount>
         </BalanceCard>
@@ -624,7 +653,7 @@ export default function WalletDetails() {
                 exit={{ opacity: 0, scale: 0.95 }}
               >
                 <ChoiceGrid>
-                  <ChoiceCard 
+                  <ChoiceCard
                     $fullWidth
                     $variant="ledger"
                     whileHover={{ y: -4 }}
@@ -634,8 +663,8 @@ export default function WalletDetails() {
                     <HistoryIcon size={24} />
                     <ChoiceTitle>View Ledger</ChoiceTitle>
                   </ChoiceCard>
-                  
-                  <ChoiceCard 
+
+                  <ChoiceCard
                     $variant="credit"
                     whileHover={{ y: -4 }}
                     whileTap={{ scale: 0.98 }}
@@ -647,8 +676,8 @@ export default function WalletDetails() {
                     <ArrowUpCircle size={32} />
                     <ChoiceTitle>Credit Funds</ChoiceTitle>
                   </ChoiceCard>
-                  
-                  <ChoiceCard 
+
+                  <ChoiceCard
                     $variant="debit"
                     whileHover={{ y: -4 }}
                     whileTap={{ scale: 0.98 }}
@@ -683,15 +712,29 @@ export default function WalletDetails() {
                         onChange={(e) => setAmountInput(e.target.value)}
                       />
                     </InputWrapper>
-                    
-                    <SubmitButton 
+
+                    <InputWrapper>
+                      <InputIcon>
+                        <AlignLeft size={20} />
+                      </InputIcon>
+                      <DescriptionInput
+                        type="text"
+                        placeholder="Description (Optional)"
+                        value={descriptionInput}
+                        onChange={(e) => setDescriptionInput(e.target.value)}
+                      />
+                    </InputWrapper>
+
+                    <SubmitButton
                       $type={txType}
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleAction}
                       disabled={isPending || !amountInput}
                     >
-                      {isPending ? <Loader2 className="animate-spin" size={20} /> : (
+                      {isPending ? (
+                        <Loader2 className="animate-spin" size={20} />
+                      ) : (
                         <>
                           <CheckCircle2 size={22} />
                           Confirm {txType}
@@ -704,12 +747,14 @@ export default function WalletDetails() {
                     <CategoryLabel>Tag a Category</CategoryLabel>
                     <IconRow>
                       {categories.map((cat) => (
-                        <IconBtn 
-                          key={cat.name} 
+                        <IconBtn
+                          key={cat.name}
                           $active={selectedCategory === cat.name}
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
+                          onClick={() =>
+                            setSelectedCategory(selectedCategory === cat.name ? null : cat.name)
+                          }
                           title={cat.name}
                         >
                           {cat.icon}
@@ -734,11 +779,13 @@ export default function WalletDetails() {
 
                 <LedgerBox>
                   {transactions.length === 0 ? (
-                    <p style={{ color: '#94a3b8', textAlign: 'center', margin: '40px 0' }}>No transactions recorded yet.</p>
+                    <p style={{ color: '#94a3b8', textAlign: 'center', margin: '40px 0' }}>
+                      No transactions recorded yet.
+                    </p>
                   ) : (
                     <>
                       {transactions.map((tx: any, idx: number) => (
-                        <TransactionRow 
+                        <TransactionRow
                           key={tx.id}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -746,27 +793,37 @@ export default function WalletDetails() {
                         >
                           <TransLeft>
                             <TransIcon $type={tx.type}>
-                              {tx.type === 'CREDIT' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                              {tx.type === 'CREDIT' ? (
+                                <TrendingUp size={20} />
+                              ) : (
+                                <TrendingDown size={20} />
+                              )}
                             </TransIcon>
                             <TransMeta>
-                              <TransTitle>{tx.type === 'CREDIT' ? 'Funds Received' : 'Funds Withdrawn'}</TransTitle>
+                              <TransTitle>
+                                {tx.type === 'CREDIT' ? 'Funds Received' : 'Funds Withdrawn'}
+                              </TransTitle>
+                              {tx.description && <TransDesc>{tx.description}</TransDesc>}
                               <TransSub>
                                 <Calendar size={12} />
-                                {new Date(tx.created_at).toLocaleDateString()} • {tx.category || 'General'}
+                                {new Date(tx.created_at).toLocaleDateString()} •{' '}
+                                {tx.category || 'General'}
                               </TransSub>
                             </TransMeta>
                           </TransLeft>
                           <TransAmount $type={tx.type}>
-                            {tx.type === 'CREDIT' ? '+' : '-'}{Number(tx.amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}
+                            {tx.type === 'CREDIT' ? '+' : '-'}{' '}
+                            {Number(tx.amount).toLocaleString('en-IN', {
+                              style: 'currency',
+                              currency: 'INR',
+                              maximumFractionDigits: 0,
+                            })}
                           </TransAmount>
                         </TransactionRow>
                       ))}
 
                       <Pagination>
-                        <PageBtn
-                          disabled={page === 0}
-                          onClick={() => setPage(p => p - 1)}
-                        >
+                        <PageBtn disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
                           Previous
                         </PageBtn>
                         <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600 }}>
@@ -774,7 +831,7 @@ export default function WalletDetails() {
                         </span>
                         <PageBtn
                           disabled={page >= totalPages - 1}
-                          onClick={() => setPage(p => p + 1)}
+                          onClick={() => setPage((p) => p + 1)}
                         >
                           Next
                         </PageBtn>
@@ -816,7 +873,7 @@ export default function WalletDetails() {
 
               <SuccessMessage>Transaction Successful</SuccessMessage>
               <SuccessSubMessage>{successModal.message}</SuccessSubMessage>
-              
+
               <motion.div
                 initial={{ width: '100%' }}
                 animate={{ width: 0 }}
@@ -826,7 +883,7 @@ export default function WalletDetails() {
                   background: '#10b981',
                   borderRadius: '2px',
                   marginTop: '24px',
-                  opacity: 0.6
+                  opacity: 0.6,
                 }}
               />
             </ModalContent>
