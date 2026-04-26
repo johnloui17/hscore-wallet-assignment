@@ -90,6 +90,7 @@ export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
           onClick={onClose}
         >
           <motion.div
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             {...(bind() as any)}
             initial={{ y: '100%', opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
