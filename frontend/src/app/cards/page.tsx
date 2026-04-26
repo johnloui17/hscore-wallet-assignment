@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -10,10 +11,45 @@ import {
   Settings, 
   Plus,
   ShieldCheck,
-  Zap
+  Zap,
+  RefreshCw,
+  Cpu
 } from 'lucide-react';
+import { CreateWalletBottomSheet } from '@/components/CreateWalletBottomSheet';
 
-/* ── Styled Components ── */
+/* ── SVG Logo Component (Shared) ── */
+function VaultLogo({ size = 40 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M32 4L8 16V32C8 47.464 18.536 58.536 32 60C45.464 58.536 56 47.464 56 32V16L32 4Z"
+        stroke="white"
+        strokeWidth="2.5"
+        fill="none"
+      />
+      <circle cx="32" cy="34" r="14" stroke="white" strokeWidth="2" fill="none" />
+      <line x1="32" y1="24" x2="32" y2="44" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="22" y1="34" x2="42" y2="34" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="32" cy="34" r="3" stroke="white" strokeWidth="1.5" fill="none" />
+      <path
+        d="M28 16V13C28 10.791 29.791 9 32 9C34.209 9 36 10.791 36 13V16"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <circle cx="16" cy="22" r="1.5" fill="white" /><circle cx="48" cy="22" r="1.5" fill="white" />
+      <circle cx="16" cy="46" r="1.5" fill="white" /><circle cx="48" cy="46" r="1.5" fill="white" />
+    </svg>
+  );
+}
+
 const Page = styled.div`
   width: 100%;
   max-width: 900px;
@@ -24,20 +60,94 @@ const Page = styled.div`
   overflow: hidden;
   position: relative;
   background-color: #0f172a;
+
+  @media (min-width: 1024px) {
+    max-width: 100%;
+    flex-direction: row;
+  }
 `;
 
-const FixedHeader = styled.div`
-  padding: 48px 20px 10px 20px;
-  background-color: #0f172a;
-  z-index: 10;
-  flex-shrink: 0;
+const Sidebar = styled.nav`
+  display: none;
+  
+  @media (min-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    background: #020617;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 48px 24px;
+    gap: 32px;
+    z-index: 100;
+  }
 `;
 
-const HeaderRow = styled.div`
+const SidebarBrand = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 20px;
+`;
+
+const BrandName = styled.h1`
+  font-size: 1.6rem;
+  margin: 0;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+`;
+
+const SidebarNav = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const SidebarItem = styled.button<{ $active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  background: ${props => props.$active ? 'rgba(59, 130, 246, 0.1)' : 'transparent'};
+  color: ${props => props.$active ? '#3b82f6' : '#94a3b8'};
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+  }
+`;
+
+const MainContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+`;
+
+const ScrollArea = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 120px 20px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  @media (min-width: 1024px) {
+    padding: 0 80px 100px 80px;
+  }
 `;
 
 const PageTitle = styled.h1`
@@ -48,24 +158,80 @@ const PageTitle = styled.h1`
   -webkit-text-fill-color: transparent;
   font-weight: 800;
   letter-spacing: -0.5px;
+
+  @media (min-width: 1024px) {
+    font-size: 2.5rem;
+  }
 `;
 
-const ScrollArea = styled.div`
-  flex: 1;
-  overflow-y: auto;
+const HeaderRow = styled.div`
+  padding: 48px 0 24px 0;
   display: flex;
   flex-direction: column;
-  padding: 10px 20px 120px 20px;
-  gap: 24px;
+  align-items: center;
+  text-align: center;
 
-  &::-webkit-scrollbar {
-    display: none;
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+    padding: 60px 0 48px 0;
   }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+`;
+
+const DesktopStatus = styled.div`
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-top: 8px;
+  }
+`;
+
+const StatusItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+`;
+
+const StatusLabel = styled.span`
+  font-size: 0.6rem;
+  color: #475569;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+`;
+
+const StatusValue = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #f1f5f9;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  svg {
+    color: #10b981;
+  }
 `;
 
 /* ── Card Designs ── */
+const CardsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px;
+    max-width: 1200px;
+  }
+`;
+
 const CardContainer = styled(motion.div)<{ $bg: string; $color: string }>`
   width: 100%;
   aspect-ratio: 1.586 / 1;
@@ -80,6 +246,11 @@ const CardContainer = styled(motion.div)<{ $bg: string; $color: string }>`
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.05);
+
+  @media (min-width: 1024px) {
+    padding: 40px;
+    border-radius: 40px;
+  }
 
   &::before {
     content: '';
@@ -106,11 +277,12 @@ const CardBrand = styled.div`
   gap: 2px;
 `;
 
-const BrandName = styled.div`
+const BrandTitle = styled.div`
   font-weight: 900;
   font-size: 1.1rem;
   letter-spacing: 2px;
   text-transform: uppercase;
+  @media (min-width: 1024px) { font-size: 1.4rem; }
 `;
 
 const BrandSub = styled.div`
@@ -141,17 +313,13 @@ const Chip = styled.div`
   }
 `;
 
-const CardMiddle = styled.div`
-  margin-top: 15px;
-  z-index: 1;
-`;
-
 const CardNumber = styled.div`
   font-size: 1.5rem;
   letter-spacing: 3px;
   font-family: 'Courier New', Courier, monospace;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
   font-weight: 600;
+  @media (min-width: 1024px) { font-size: 2rem; }
 `;
 
 const CardBottom = styled.div`
@@ -204,7 +372,6 @@ const GeometricPattern = styled.div`
   pointer-events: none;
 `;
 
-/* ── Footer ── */
 const Footer = styled.nav`
   position: absolute;
   bottom: 0;
@@ -219,6 +386,10 @@ const Footer = styled.nav`
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   z-index: 20;
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
 `;
 
 const FooterItem = styled.button<{ $active?: boolean }>`
@@ -231,17 +402,11 @@ const FooterItem = styled.button<{ $active?: boolean }>`
   cursor: pointer;
   padding: 6px 12px;
   color: ${props => props.$active ? '#3b82f6' : '#475569'};
-  transition: color 0.2s;
-
-  &:hover {
-    color: ${props => props.$active ? '#3b82f6' : '#94a3b8'};
-  }
 `;
 
 const FooterLabel = styled.span`
   font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.3px;
 `;
 
 const AddButton = styled(motion.button)`
@@ -257,121 +422,156 @@ const AddButton = styled(motion.button)`
   box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.45);
   cursor: pointer;
   margin-top: -20px;
+
+  @media (min-width: 1024px) {
+    margin-top: 0;
+    width: 100%;
+    height: auto;
+    padding: 16px;
+    border-radius: 18px;
+    font-size: 1rem;
+    gap: 12px;
+  }
+`;
+
+const DesktopOnly = styled.div`
+  display: none;
+  @media (min-width: 1024px) {
+    display: block;
+  }
+`;
+
+const MobileOnly = styled.div`
+  display: block;
+  @media (min-width: 1024px) {
+    display: none;
+  }
 `;
 
 export default function CardsPage() {
   const router = useRouter();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
     <Page>
-      <FixedHeader>
-        <HeaderRow>
-          <PageTitle>My Cards</PageTitle>
-        </HeaderRow>
-      </FixedHeader>
-
-      <ScrollArea>
-        {/* Elysian Black Card */}
-        <CardContainer 
-          $bg="linear-gradient(145deg, #0f172a 0%, #020617 100%)" 
-          $color="#f8fafc"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <GeometricPattern style={{ opacity: 0.05 }} />
-          <CardTop>
-            <CardBrand>
-              <BrandName>ELYSIAN</BrandName>
-              <BrandSub>BLACK</BrandSub>
-            </CardBrand>
-            <ShieldCheck size={28} strokeWidth={1.5} style={{ opacity: 0.6 }} />
-          </CardTop>
-          
-          <CardMiddle>
-            <Chip />
-            <div style={{ marginTop: '24px' }}>
-              <CardNumber>**** **** 4410</CardNumber>
-            </div>
-          </CardMiddle>
-
-          <CardBottom>
-            <HolderInfo>
-              <Label>Valued Member</Label>
-              <HolderName>JOHN DOE</HolderName>
-            </HolderInfo>
-            <PremiumBadge>PRIME</PremiumBadge>
-          </CardBottom>
-        </CardContainer>
-
-        {/* Obsidian Onyx Card */}
-        <CardContainer 
-          $bg="linear-gradient(145deg, #1e293b 0%, #000000 100%)" 
-          $color="#94a3b8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <GeometricPattern style={{ opacity: 0.08, backgroundImage: 'linear-gradient(45deg, #ffffff 1px, transparent 1px)' }} />
-          <CardTop>
-            <CardBrand>
-              <BrandName style={{ color: '#ffffff' }}>OBSIDIAN</BrandName>
-              <BrandSub style={{ color: '#3b82f6' }}>ONYX</BrandSub>
-            </CardBrand>
-            <Zap size={28} strokeWidth={1.5} style={{ color: '#3b82f6', opacity: 0.8 }} />
-          </CardTop>
-
-          <CardMiddle>
-            <Chip style={{ background: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' }} />
-            <div style={{ marginTop: '24px' }}>
-              <CardNumber style={{ color: '#ffffff' }}>**** **** 5592</CardNumber>
-            </div>
-          </CardMiddle>
-
-          <CardBottom>
-            <HolderInfo>
-              <Label>Valid Thru</Label>
-              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f8fafc' }}>10/29</div>
-            </HolderInfo>
-            <PremiumBadge style={{ borderColor: '#3b82f6', color: '#3b82f6' }}>EXECUTIVE</PremiumBadge>
-          </CardBottom>
-        </CardContainer>
-
-        <div style={{ textAlign: 'center', padding: '20px', color: '#475569', fontSize: '0.9rem' }}>
-          <p>These card previews are exclusive to your account tier.</p>
-          <p style={{ marginTop: '4px' }}>Digital activation is available in Settings.</p>
+      <Sidebar>
+        <SidebarBrand>
+          <VaultLogo size={32} />
+          <BrandName>Pocket Feel</BrandName>
+        </SidebarBrand>
+        <SidebarNav>
+          <SidebarItem onClick={() => router.push('/')}><Home size={20} />Home</SidebarItem>
+          <SidebarItem onClick={() => router.push('/activity')}><ActivityIcon size={20} />Activity</SidebarItem>
+          <SidebarItem $active><CreditCardIcon size={20} />Cards</SidebarItem>
+          <SidebarItem onClick={() => router.push('/settings')}><Settings size={20} />Settings</SidebarItem>
+        </SidebarNav>
+        <div style={{ marginTop: 'auto' }}>
+          <AddButton whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCreateOpen(true)}>
+            <Plus size={20} strokeWidth={2.5} /><span>Create Wallet</span>
+          </AddButton>
         </div>
-      </ScrollArea>
+      </Sidebar>
 
-      <Footer>
-        <FooterItem onClick={() => router.push('/')}>
-          <Home size={20} />
-          <FooterLabel>Home</FooterLabel>
-        </FooterItem>
+      <MainContent>
+        <ScrollArea>
+          <HeaderRow>
+            <div>
+              <PageTitle>Digital Assets</PageTitle>
+              <DesktopOnly><p style={{ color: '#64748b', fontSize: '1.1rem', fontWeight: 500, marginTop: '8px' }}>Manage your premium physical and virtual cards.</p></DesktopOnly>
+            </div>
+            <DesktopStatus>
+              <StatusItem><StatusLabel>Security</StatusLabel><StatusValue><ShieldCheck size={14} />NFC Encrypted</StatusValue></StatusItem>
+              <StatusItem><StatusLabel>Network</StatusLabel><StatusValue><RefreshCw size={14} />Cloud Sync</StatusValue></StatusItem>
+            </DesktopStatus>
+          </HeaderRow>
 
-        <FooterItem onClick={() => router.push('/activity')}>
-          <ActivityIcon size={20} />
-          <FooterLabel>Activity</FooterLabel>
-        </FooterItem>
+          <CardsGrid>
+            {/* Elysian Black Card */}
+            <CardContainer 
+              $bg="linear-gradient(145deg, #0f172a 0%, #020617 100%)" 
+              $color="#f8fafc"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+            >
+              <GeometricPattern style={{ opacity: 0.05 }} />
+              <CardTop>
+                <CardBrand>
+                  <BrandTitle>ELYSIAN</BrandTitle>
+                  <BrandSub>BLACK</BrandSub>
+                </CardBrand>
+                <Cpu size={32} strokeWidth={1.5} style={{ opacity: 0.6 }} />
+              </CardTop>
+              
+              <div>
+                <Chip />
+                <div style={{ marginTop: '24px' }}>
+                  <CardNumber>**** **** 4410</CardNumber>
+                </div>
+              </div>
 
-        <AddButton
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.92 }}
-          onClick={() => router.push('/')}
-        >
-          <Plus size={28} strokeWidth={2.5} />
-        </AddButton>
+              <CardBottom>
+                <HolderInfo>
+                  <Label>Valued Member</Label>
+                  <HolderName>JOHN DOE</HolderName>
+                </HolderInfo>
+                <PremiumBadge>PRIME</PremiumBadge>
+              </CardBottom>
+            </CardContainer>
 
-        <FooterItem $active>
-          <CreditCardIcon size={20} />
-          <FooterLabel>Cards</FooterLabel>
-        </FooterItem>
+            {/* Obsidian Onyx Card */}
+            <CardContainer 
+              $bg="linear-gradient(145deg, #1e293b 0%, #000000 100%)" 
+              $color="#94a3b8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+            >
+              <GeometricPattern style={{ opacity: 0.08, backgroundImage: 'linear-gradient(45deg, #ffffff 1px, transparent 1px)' }} />
+              <CardTop>
+                <CardBrand>
+                  <BrandTitle style={{ color: '#ffffff' }}>OBSIDIAN</BrandTitle>
+                  <BrandSub style={{ color: '#3b82f6' }}>ONYX</BrandSub>
+                </CardBrand>
+                <Zap size={32} strokeWidth={1.5} style={{ color: '#3b82f6', opacity: 0.8 }} />
+              </CardTop>
 
-        <FooterItem onClick={() => router.push('/settings')}>
-          <Settings size={20} />
-          <FooterLabel>Settings</FooterLabel>
-        </FooterItem>
-      </Footer>
+              <div>
+                <Chip style={{ background: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' }} />
+                <div style={{ marginTop: '24px' }}>
+                  <CardNumber style={{ color: '#ffffff' }}>**** **** 5592</CardNumber>
+                </div>
+              </div>
+
+              <CardBottom>
+                <HolderInfo>
+                  <Label>Valid Thru</Label>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f8fafc' }}>10/29</div>
+                </HolderInfo>
+                <PremiumBadge style={{ borderColor: '#3b82f6', color: '#3b82f6' }}>EXECUTIVE</PremiumBadge>
+              </CardBottom>
+            </CardContainer>
+          </CardsGrid>
+
+          <div style={{ textAlign: 'center', padding: '48px 0', color: '#475569', fontSize: '0.95rem' }}>
+            <p>These card previews are exclusive to your account tier.</p>
+            <p style={{ marginTop: '4px' }}>Digital activation is available in Settings.</p>
+          </div>
+        </ScrollArea>
+
+        <MobileOnly>
+          <Footer>
+            <FooterItem onClick={() => router.push('/')}><Home size={20} /><FooterLabel>Home</FooterLabel></FooterItem>
+            <FooterItem onClick={() => router.push('/activity')}><ActivityIcon size={20} /><FooterLabel>Activity</FooterLabel></FooterItem>
+            <AddButton whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }} onClick={() => router.push('/')}><Plus size={28} strokeWidth={2.5} /></AddButton>
+            <FooterItem $active><CreditCardIcon size={20} /><FooterLabel>Cards</FooterLabel></FooterItem>
+            <FooterItem onClick={() => router.push('/settings')}><Settings size={20} /><FooterLabel>Settings</FooterLabel></FooterItem>
+          </Footer>
+        </MobileOnly>
+      </MainContent>
+      <CreateWalletBottomSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
     </Page>
   );
 }

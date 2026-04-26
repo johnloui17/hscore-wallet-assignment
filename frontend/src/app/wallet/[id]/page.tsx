@@ -248,6 +248,15 @@ const Input = styled.input`
   &::placeholder {
     color: #475569;
   }
+
+  /* Remove number arrows */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  appearance: none;
+  -moz-appearance: textfield;
 `;
 
 const DescriptionInput = styled(Input)`
@@ -606,6 +615,26 @@ export default function WalletDetails() {
     return () => clearTimeout(timer);
   }, [successModal.visible]);
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/[^0-9.]/g, '');
+    if (!rawValue) {
+      setAmountInput('');
+      return;
+    }
+
+    if (rawValue.endsWith('.')) {
+      setAmountInput(rawValue);
+      return;
+    }
+
+    const parts = rawValue.split('.');
+    let formatted = Number(parts[0]).toLocaleString('en-IN');
+    if (parts.length > 1) {
+      formatted += '.' + parts[1].substring(0, 2);
+    }
+    setAmountInput(formatted);
+  };
+
   const creditMutation = useMutation({
     mutationFn: (amount: number) => credit(walletId, amount, selectedCategory || undefined, descriptionInput || undefined),
     onSuccess: () => {
@@ -613,7 +642,7 @@ export default function WalletDetails() {
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
       setSuccessModal({
         visible: true,
-        message: `Successfully added ₹${Number(amountInput).toLocaleString('en-IN')}`,
+        message: `Successfully added ₹${amountInput}`,
       });
       resetForm();
     },
@@ -630,7 +659,7 @@ export default function WalletDetails() {
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
       setSuccessModal({
         visible: true,
-        message: `Successfully withdrawn ₹${Number(amountInput).toLocaleString('en-IN')}`,
+        message: `Successfully withdrawn ₹${amountInput}`,
       });
       resetForm();
     },
@@ -650,8 +679,14 @@ export default function WalletDetails() {
 
   const handleAction = () => {
     if (!amountInput || !txType) return;
-    if (txType === 'credit') creditMutation.mutate(Number(amountInput));
-    else debitMutation.mutate(Number(amountInput));
+    const numericAmount = Number(amountInput.replace(/,/g, ''));
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    if (txType === 'credit') creditMutation.mutate(numericAmount);
+    else debitMutation.mutate(numericAmount);
   };
 
   const handleDelete = async () => {
@@ -825,11 +860,11 @@ export default function WalletDetails() {
                     <InputWrapper>
                       <CurrencySymbol>₹</CurrencySymbol>
                       <Input
-                        type="number"
+                        type="text"
                         placeholder="0.00"
                         autoFocus
                         value={amountInput}
-                        onChange={(e) => setAmountInput(e.target.value)}
+                        onChange={handleAmountChange}
                       />
                     </InputWrapper>
 

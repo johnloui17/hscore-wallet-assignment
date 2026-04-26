@@ -4,6 +4,7 @@ import './globals.css';
 import Providers from '@/lib/query-provider';
 import StyledComponentsRegistry from '@/lib/registry';
 import { Toaster } from 'sonner';
+import ClientLayout from '@/components/ClientLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,11 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <StyledComponentsRegistry>
           <Providers>
-            {children}
+            <ClientLayout>
+              {children}
+            </ClientLayout>
             <Toaster position="top-right" richColors theme="dark" />
           </Providers>
         </StyledComponentsRegistry>
