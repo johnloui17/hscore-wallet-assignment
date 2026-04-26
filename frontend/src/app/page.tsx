@@ -1,8 +1,8 @@
 import { getAllWallets } from '@/lib/api';
 import { PortfolioClient } from '@/components/PortfolioClient';
 
-// Enable edge runtime for performance if needed, or keep node
-// export const runtime = 'edge';
+// Ensure the page is always dynamic to show fresh data
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // Fetch data on the server

@@ -60,6 +60,66 @@ const Page = styled.div`
   overflow: hidden;
   position: relative;
   background-color: #0f172a;
+
+  @media (min-width: 1024px) {
+    max-width: 1400px;
+    flex-direction: row;
+  }
+`;
+
+const Sidebar = styled.nav`
+  display: none;
+  
+  @media (min-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    background: rgba(15, 23, 42, 0.9);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 48px 24px;
+    gap: 32px;
+  }
+`;
+
+const SidebarBrand = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+`;
+
+const SidebarNav = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const SidebarItem = styled.button<{ $active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  background: ${props => props.$active ? 'rgba(59, 130, 246, 0.1)' : 'transparent'};
+  color: ${props => props.$active ? '#3b82f6' : '#94a3b8'};
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+  }
+`;
+
+const MainContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 `;
 
 const ScrollArea = styled.div`
@@ -74,15 +134,25 @@ const ScrollArea = styled.div`
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+
+  @media (min-width: 1024px) {
+    padding: 60px 80px;
+  }
 `;
 
-/* ── Header (Centered) ── */
+/* ── Header ── */
 const HeaderSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   margin-bottom: 24px;
+
+  @media (min-width: 1024px) {
+    align-items: flex-start;
+    text-align: left;
+    margin-bottom: 40px;
+  }
 `;
 
 const LogoTitleRow = styled.div`
@@ -91,6 +161,10 @@ const LogoTitleRow = styled.div`
   justify-content: center;
   gap: 12px;
   margin-bottom: 24px;
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
 `;
 
 const BrandName = styled.h1`
@@ -126,6 +200,12 @@ const SummaryCardContainer = styled.div`
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
   }
+
+  @media (min-width: 1024px) {
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 32px;
+  }
 `;
 
 const SummaryLabel = styled.div`
@@ -159,7 +239,7 @@ const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding: 0 4px;
 `;
 
@@ -170,12 +250,17 @@ const SectionTitle = styled.h2`
   margin: 0;
 `;
 
-/* ── Wallet Card ── */
+/* ── Wallet Card (Compact Grid) ── */
 const WalletList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   padding-bottom: 40px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
 `;
 
 const WalletInfoCard = styled(motion.div)<{ $accentColor: string }>`
@@ -183,122 +268,104 @@ const WalletInfoCard = styled(motion.div)<{ $accentColor: string }>`
     rgba(30, 41, 59, 0.85) 0%,
     rgba(15, 23, 42, 0.95) 100%
   );
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 20px;
   position: relative;
   overflow: hidden;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
 
   &::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 24px;
-    right: 24px;
+    left: 16px;
+    right: 16px;
     height: 3px;
     border-radius: 0 0 3px 3px;
     background: ${props => props.$accentColor};
     opacity: 0.7;
   }
-`;
 
-const CardContentRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-`;
-
-const LeftCol = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const RightCol = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-  gap: 12px;
+  @media (min-width: 1024px) {
+    padding: 28px;
+    border-radius: 24px;
+    min-height: 180px;
+    
+    &:hover {
+      border-color: rgba(59, 130, 246, 0.3);
+      transform: translateY(-4px);
+    }
+  }
 `;
 
 const CardLabel = styled.div`
-  font-size: 0.65rem;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  font-weight: 700;
-  margin-bottom: 4px;
-`;
-
-const CardName = styled.h2`
-  font-size: 1.25rem;
-  color: #f1f5f9;
-  margin: 0 0 16px 0;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const SubscriptionBadge = styled.div<{ $color: string }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  background: ${props => props.$color}18;
-  color: ${props => props.$color};
-  border: 1px solid ${props => props.$color}30;
-`;
-
-const BalanceSection = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const CardBalanceLabel = styled.div`
-  font-size: 0.65rem;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  font-weight: 700;
-`;
-
-const CardBalance = styled.div`
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.5px;
-  margin-top: 2px;
-`;
-
-const ExpiryContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-`;
-
-const ExpiryLabel = styled.span`
   font-size: 0.6rem;
   color: #475569;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
+  margin-bottom: 4px;
 `;
 
-const ExpiryValue = styled.span`
-  font-size: 0.75rem;
-  color: #94a3b8;
-  font-weight: 600;
+const CardName = styled.h2`
+  font-size: 1rem;
+  color: #f1f5f9;
+  margin: 0;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  @media (min-width: 1024px) {
+    font-size: 1.25rem;
+  }
+`;
+
+const CardBalance = styled.div`
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-top: 8px;
+
+  @media (min-width: 1024px) {
+    font-size: 1.8rem;
+  }
+`;
+
+const CardBottom = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+`;
+
+const PlanIndicator = styled.div<{ $color: string }>`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: ${props => props.$color};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${props => props.$color};
+  }
 `;
 
 /* ── Empty State ── */
@@ -308,6 +375,7 @@ const EmptyState = styled.div`
   background: rgba(30, 41, 59, 0.3);
   border-radius: 24px;
   border: 1px dashed rgba(255, 255, 255, 0.08);
+  grid-column: span 2;
 `;
 
 /* ── Footer ── */
@@ -322,6 +390,10 @@ const Footer = styled.nav`
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
 `;
 
 const FooterItem = styled.button<{ $active?: boolean }>`
@@ -360,6 +432,16 @@ const AddButton = styled(motion.button)`
   box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.45);
   cursor: pointer;
   margin-top: -20px;
+
+  @media (min-width: 1024px) {
+    margin-top: 0;
+    width: auto;
+    height: auto;
+    padding: 14px 24px;
+    border-radius: 16px;
+    justify-content: flex-start;
+    gap: 12px;
+  }
 `;
 
 /* ── Helpers ── */
@@ -372,17 +454,6 @@ function getAccentColor(index: number) {
 
 function getPlanName(index: number) {
   return PLAN_NAMES[index % PLAN_NAMES.length];
-}
-
-function getExpiryDate(createdAt?: string) {
-  const base = createdAt ? new Date(createdAt) : new Date();
-  const expiry = new Date(base);
-  expiry.setFullYear(expiry.getFullYear() + 1);
-  return expiry.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
 }
 
 /* ── Main Component ── */
@@ -398,119 +469,155 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
 
   return (
     <Page>
-      <ScrollArea>
-        {/* ── Header ── */}
-        <HeaderSection>
-          <LogoTitleRow>
-            <VaultLogo size={36} />
-            <BrandName>Pocket Feel</BrandName>
-          </LogoTitleRow>
-        </HeaderSection>
+      {/* ── Desktop Sidebar ── */}
+      <Sidebar>
+        <SidebarBrand>
+          <VaultLogo size={32} />
+          <BrandName>Pocket Feel</BrandName>
+        </SidebarBrand>
 
-        {/* ── Section 1: Summary Card ── */}
-        <SummaryCardContainer>
-          <SummaryLabel>Total Balance</SummaryLabel>
-          <SummaryValue>
-            {totalValue.toLocaleString('en-IN', {
-              style: 'currency',
-              currency: 'INR',
-              maximumFractionDigits: 0,
-            })}
-          </SummaryValue>
-          <UserName>
-            <User size={20} />
-            John Doe
-          </UserName>
-        </SummaryCardContainer>
+        <SidebarNav>
+          <SidebarItem onClick={() => router.push('/')} $active>
+            <Home size={20} />
+            Home
+          </SidebarItem>
+          <SidebarItem onClick={() => router.push('/activity')}>
+            <Activity size={20} />
+            Activity
+          </SidebarItem>
+          <SidebarItem onClick={() => router.push('/cards')}>
+            <CreditCard size={20} />
+            Cards
+          </SidebarItem>
+          <SidebarItem onClick={() => router.push('/settings')}>
+            <Settings size={20} />
+            Settings
+          </SidebarItem>
+        </SidebarNav>
 
-        {/* ── Section 2: Wallets List ── */}
-        <SectionHeader>
-          <SectionTitle>Wallets</SectionTitle>
-        </SectionHeader>
+        <div style={{ marginTop: 'auto' }}>
+          <AddButton
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setIsCreateOpen(true)}
+          >
+            <Plus size={20} strokeWidth={2.5} />
+            <span style={{ fontWeight: 700 }}>Create Wallet</span>
+          </AddButton>
+        </div>
+      </Sidebar>
 
-        {wallets.length === 0 ? (
-          <EmptyState>
-            <h3 style={{ color: 'white', margin: '0 0 8px 0', fontSize: '1.1rem' }}>No wallets yet</h3>
-            <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>
-              Tap the + button below to create your first wallet.
-            </p>
-          </EmptyState>
-        ) : (
-          <WalletList>
-            {wallets.map((wallet, index) => (
-              <WalletInfoCard
-                key={wallet.id}
-                $accentColor={getAccentColor(index)}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => router.push(`/wallet/${wallet.id}`)}
-                whileTap={{ scale: 0.98 }}
-              >
-                <CardContentRow>
-                  <LeftCol>
-                    <CardLabel>Account Name</CardLabel>
-                    <CardName>{wallet.name || 'Unnamed Wallet'}</CardName>
+      <MainContent>
+        <ScrollArea>
+          {/* ── Mobile Header ── */}
+          <HeaderSection>
+            <LogoTitleRow>
+              <VaultLogo size={36} />
+              <BrandName>Pocket Feel</BrandName>
+            </LogoTitleRow>
+            
+            <div className="desktop-only" style={{ marginBottom: '8px' }}>
+              <h1 style={{ color: 'white', fontSize: '2rem', fontWeight: 800 }}>Welcome back, John</h1>
+              <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: 500 }}>Here's what's happening with your wallets.</p>
+            </div>
+          </HeaderSection>
 
-                    <BalanceSection>
-                      <CardBalanceLabel>Balance</CardBalanceLabel>
-                      <CardBalance>
-                        {Number(wallet.balance).toLocaleString('en-IN', {
-                          style: 'currency',
-                          currency: 'INR',
-                          maximumFractionDigits: 0,
-                        })}
-                      </CardBalance>
-                    </BalanceSection>
-                  </LeftCol>
+          {/* ── Section 1: Summary Card ── */}
+          <SummaryCardContainer>
+            <SummaryLabel>Total Balance</SummaryLabel>
+            <SummaryValue>
+              {totalValue.toLocaleString('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0,
+              })}
+            </SummaryValue>
+            <UserName>
+              <User size={20} />
+              John Doe
+            </UserName>
+          </SummaryCardContainer>
 
-                  <RightCol>
-                    <SubscriptionBadge $color={getAccentColor(index)}>
-                      ● {getPlanName(index)} Plan
-                    </SubscriptionBadge>
+          {/* ── Section 2: Compact Wallets Grid ── */}
+          <SectionHeader>
+            <SectionTitle>My Wallets</SectionTitle>
+          </SectionHeader>
 
-                    <ExpiryContainer>
-                      <ExpiryLabel>Plan Expires</ExpiryLabel>
-                      <ExpiryValue>{getExpiryDate(wallet.createdAt)}</ExpiryValue>
-                    </ExpiryContainer>
-                  </RightCol>
-                </CardContentRow>
-              </WalletInfoCard>
-            ))}
-          </WalletList>
-        )}
-      </ScrollArea>
+          {wallets.length === 0 ? (
+            <EmptyState>
+              <h3 style={{ color: 'white', margin: '0 0 8px 0', fontSize: '1.1rem' }}>No wallets yet</h3>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>
+                Tap the + button to create your first wallet.
+              </p>
+            </EmptyState>
+          ) : (
+            <WalletList>
+              {wallets.map((wallet, index) => (
+                <WalletInfoCard
+                  key={wallet.id}
+                  $accentColor={getAccentColor(index)}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  onClick={() => router.push(`/wallet/${wallet.id}`)}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div>
+                    <CardLabel>{wallet.name || 'Account'}</CardLabel>
+                    <CardName>{wallet.name || 'Unnamed'}</CardName>
+                  </div>
 
-      {/* ── Footer Navigation ── */}
-      <Footer>
-        <FooterItem onClick={() => router.push('/')} $active>
-          <Home size={20} />
-          <FooterLabel>Home</FooterLabel>
-        </FooterItem>
+                  <div>
+                    <CardBalance>
+                      {Number(wallet.balance).toLocaleString('en-IN', {
+                        style: 'currency',
+                        currency: 'INR',
+                        maximumFractionDigits: 0,
+                      })}
+                    </CardBalance>
+                    <CardBottom>
+                      <PlanIndicator $color={getAccentColor(index)}>
+                        {getPlanName(index)}
+                      </PlanIndicator>
+                    </CardBottom>
+                  </div>
+                </WalletInfoCard>
+              ))}
+            </WalletList>
+          )}
+        </ScrollArea>
 
-        <FooterItem onClick={() => router.push('/activity')}>
-          <Activity size={20} />
-          <FooterLabel>Activity</FooterLabel>
-        </FooterItem>
+        {/* ── Mobile Footer Navigation ── */}
+        <Footer>
+          <FooterItem onClick={() => router.push('/')} $active>
+            <Home size={20} />
+            <FooterLabel>Home</FooterLabel>
+          </FooterItem>
 
-        <AddButton
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.92 }}
-          onClick={() => setIsCreateOpen(true)}
-        >
-          <Plus size={28} strokeWidth={2.5} />
-        </AddButton>
+          <FooterItem onClick={() => router.push('/activity')}>
+            <Activity size={20} />
+            <FooterLabel>Activity</FooterLabel>
+          </FooterItem>
 
-        <FooterItem onClick={() => router.push('/cards')}>
-          <CreditCard size={20} />
-          <FooterLabel>Cards</FooterLabel>
-        </FooterItem>
+          <AddButton
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setIsCreateOpen(true)}
+          >
+            <Plus size={28} strokeWidth={2.5} />
+          </AddButton>
 
-        <FooterItem onClick={() => router.push('/settings')}>
-          <Settings size={20} />
-          <FooterLabel>Settings</FooterLabel>
-        </FooterItem>
-      </Footer>
+          <FooterItem onClick={() => router.push('/cards')}>
+            <CreditCard size={20} />
+            <FooterLabel>Cards</FooterLabel>
+          </FooterItem>
+
+          <FooterItem onClick={() => router.push('/settings')}>
+            <Settings size={20} />
+            <FooterLabel>Settings</FooterLabel>
+          </FooterItem>
+        </Footer>
+      </MainContent>
 
       <CreateWalletBottomSheet
         isOpen={isCreateOpen}

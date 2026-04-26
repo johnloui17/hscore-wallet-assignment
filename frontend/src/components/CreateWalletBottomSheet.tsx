@@ -6,6 +6,7 @@ import { BottomSheet } from './BottomSheet';
 import { createWalletAction } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const Title = styled.h2`
   margin: 0 0 24px 0;
@@ -75,6 +76,7 @@ interface CreateWalletBottomSheetProps {
 }
 
 export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomSheetProps) {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
   const [isPending, setIsPending] = useState(false);
@@ -94,6 +96,7 @@ export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomS
       toast.success('Wallet created successfully!');
       setName('');
       setBalance('');
+      router.refresh();
       onClose();
     } else {
       toast.error(result.error);

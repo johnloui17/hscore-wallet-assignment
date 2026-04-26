@@ -24,9 +24,12 @@ import {
   History as HistoryIcon, 
   CheckCircle2, 
   X,
-  AlignLeft
+  AlignLeft,
+  Trash2,
+  AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { deleteWalletAction } from '@/app/actions';
 
 /* ── Styled Components ── */
 const Page = styled.div`
@@ -423,6 +426,47 @@ const PageBtn = styled.button`
   }
 `;
 
+/* ── Delete UI ── */
+const DeleteSection = styled.div`
+  margin-top: auto;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+`;
+
+const DeleteBtn = styled(motion.button)`
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.15);
+  }
+`;
+
+const ConfirmDeleteBox = styled(motion.div)`
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 24px;
+  border-radius: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+`;
+
 /* ── Success Modal UI ── */
 const ModalOverlay = styled(motion.div)`
   position: fixed;
@@ -515,6 +559,9 @@ export default function WalletDetails() {
   const [page, setPage] = useState(0);
   const limit = 4;
 
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [successModal, setSuccessModal] = useState<{ visible: boolean; message: string }>({
     visible: false,
     message: '',
@@ -593,6 +640,24 @@ export default function WalletDetails() {
     else debitMutation.mutate(Number(amountInput));
   };
 
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteWalletAction(walletId);
+      if (result.success) {
+        toast.success('Wallet deleted successfully');
+        // Force immediate redirection to home page
+        window.location.href = '/';
+      } else {
+        toast.error(result.error);
+        setIsDeleting(false);
+      }
+    } catch (error) {
+      toast.error('An error occurred while deleting the wallet');
+      setIsDeleting(false);
+    }
+  };
+
   const handleBack = () => {
     if (viewMode === 'choice') {
       router.push('/');
@@ -651,6 +716,7 @@ export default function WalletDetails() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
+                style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
               >
                 <ChoiceGrid>
                   <ChoiceCard
@@ -690,6 +756,45 @@ export default function WalletDetails() {
                     <ChoiceTitle>Debit Funds</ChoiceTitle>
                   </ChoiceCard>
                 </ChoiceGrid>
+
+                <DeleteSection>
+                  {!confirmDelete ? (
+                    <DeleteBtn
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setConfirmDelete(true)}
+                    >
+                      <Trash2 size={18} />
+                      Delete Wallet
+                    </DeleteBtn>
+                  ) : (
+                    <ConfirmDeleteBox
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                    >
+                      <AlertCircle size={32} color="#ef4444" />
+                      <div>
+                        <h4 style={{ color: 'white', margin: '0 0 4px 0' }}>Are you sure?</h4>
+                        <p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>This action cannot be undone.</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
+                        <SubmitButton 
+                          $type="credit" 
+                          style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }}
+                          onClick={() => setConfirmDelete(false)}
+                        >
+                          Cancel
+                        </SubmitButton>
+                        <SubmitButton 
+                          $type="debit"
+                          onClick={handleDelete}
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete'}
+                        </SubmitButton>
+                      </div>
+                    </ConfirmDeleteBox>
+                  )}
+                </DeleteSection>
               </motion.div>
             )}
 
