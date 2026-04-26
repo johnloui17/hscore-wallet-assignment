@@ -294,7 +294,7 @@ export default function CardsPage() {
           <CardMiddle>
             <Chip />
             <div style={{ marginTop: '24px' }}>
-              <CardNumber>8824 0091 7726 4410</CardNumber>
+              <CardNumber>**** **** 4410</CardNumber>
             </div>
           </CardMiddle>
 
@@ -327,7 +327,7 @@ export default function CardsPage() {
           <CardMiddle>
             <Chip style={{ background: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' }} />
             <div style={{ marginTop: '24px' }}>
-              <CardNumber style={{ color: '#ffffff' }}>4412 8839 0012 5592</CardNumber>
+              <CardNumber style={{ color: '#ffffff' }}>**** **** 5592</CardNumber>
             </div>
           </CardMiddle>
 
