@@ -8,8 +8,8 @@ import { Toaster } from 'sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Digital Vault',
-  description: 'High-Integrity Digital Wallet',
+  title: 'Pocket Feel',
+  description: 'Your personal digital wallet',
 };
 
 export default function RootLayout({

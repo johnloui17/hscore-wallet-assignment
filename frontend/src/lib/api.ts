@@ -11,7 +11,7 @@ export async function createWallet(name: string, initialBalance: number = 0) {
 }
 
 export async function getAllWallets() {
-  const res = await fetch(BASE_URL, { cache: 'no-store' });
+  const res = await fetch(BASE_URL, { next: { tags: ['wallets'] } });
   if (!res.ok) throw new Error('Failed to fetch wallets');
   return res.json();
 }
@@ -22,7 +22,7 @@ export async function deleteWallet(id: string) {
 }
 
 export async function getBalance(id: string) {
-  const res = await fetch(`${BASE_URL}/${id}`);
+  const res = await fetch(`${BASE_URL}/${id}`, { next: { tags: [`balance-${id}`] } });
   if (!res.ok) throw new Error('Failed to fetch balance');
   return res.json();
 }
@@ -49,7 +49,7 @@ export async function debit(id: string, amount: number, category?: string) {
 }
 
 export async function getHistory(id: string, limit: number = 10, offset: number = 0) {
-  const res = await fetch(`${BASE_URL}/${id}/history?limit=${limit}&offset=${offset}`);
+  const res = await fetch(`${BASE_URL}/${id}/history?limit=${limit}&offset=${offset}`, { next: { tags: [`history-${id}`] } });
   if (!res.ok) throw new Error('Failed to fetch history');
   return res.json();
 }

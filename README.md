@@ -1,8 +1,7 @@
-# Digital Vault - High-Integrity Wallet Assignment
+# Pocket Feel - Your Personal Digital Wallet
+Pocket Feel is a modern, high-integrity full-stack digital wallet application. It provides a secure and intuitive interface for managing multiple wallets, tracking balances, and categorizing transactions.
+![Pocket Feel Dashboard](./assets/homePage.png)
 
-Digital Vault is a modern, high-integrity full-stack digital wallet application. It provides a secure and intuitive interface for managing multiple wallets, tracking balances, and categorizing transactions.
-
-![Digital Vault Dashboard](./assets/homePage.png)
 
 ## 🚀 Key Functionalities
 
