@@ -53,3 +53,22 @@ export async function getHistory(id: string, limit: number = 10, offset: number 
   if (!res.ok) throw new Error('Failed to fetch history');
   return res.json();
 }
+
+export async function getAllActivity(params: Record<string, any>) {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      if (key === 'walletIds' && Array.isArray(value)) {
+        if (value.length > 0) {
+          query.append('walletId', value.join(','));
+        }
+      } else {
+        query.append(key, value.toString());
+      }
+    }
+  });
+  
+  const res = await fetch(`${BASE_URL}/transactions/all?${query.toString()}`, { next: { tags: ['all-activity'] } });
+  if (!res.ok) throw new Error('Failed to fetch global activity');
+  return res.json();
+}

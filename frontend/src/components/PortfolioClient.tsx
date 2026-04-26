@@ -483,12 +483,12 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
 
       {/* ── Footer Navigation ── */}
       <Footer>
-        <FooterItem $active>
+        <FooterItem onClick={() => router.push('/')} $active>
           <Home size={20} />
           <FooterLabel>Home</FooterLabel>
         </FooterItem>
 
-        <FooterItem>
+        <FooterItem onClick={() => router.push('/activity')}>
           <Activity size={20} />
           <FooterLabel>Activity</FooterLabel>
         </FooterItem>
@@ -501,12 +501,12 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
           <Plus size={28} strokeWidth={2.5} />
         </AddButton>
 
-        <FooterItem>
+        <FooterItem onClick={() => router.push('/cards')}>
           <CreditCard size={20} />
           <FooterLabel>Cards</FooterLabel>
         </FooterItem>
 
-        <FooterItem>
+        <FooterItem onClick={() => router.push('/settings')}>
           <Settings size={20} />
           <FooterLabel>Settings</FooterLabel>
         </FooterItem>

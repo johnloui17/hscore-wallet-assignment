@@ -150,4 +150,47 @@ export class WalletService {
     });
     return { transactions, total };
   }
+
+  async getAllTransactions(
+    limit = 10,
+    offset = 0,
+    type?: string,
+    category?: string,
+    startDate?: string,
+    endDate?: string,
+    sortBy: 'date' | 'amount' = 'date',
+    sortOrder: 'ASC' | 'DESC' = 'DESC',
+    walletIds?: string[]
+  ): Promise<{ transactions: Transaction[], total: number }> {
+    const query = this.transactionRepository.createQueryBuilder('transaction')
+      .leftJoinAndSelect('transaction.wallet', 'wallet')
+      .take(limit)
+      .skip(offset);
+
+    if (walletIds && walletIds.length > 0) {
+      query.andWhere('transaction.wallet_id IN (:...walletIds)', { walletIds });
+    }
+
+    if (type) {
+      query.andWhere('transaction.type = :type', { type });
+    }
+
+    if (category) {
+      query.andWhere('transaction.category = :category', { category });
+    }
+
+    if (startDate) {
+      query.andWhere('transaction.created_at >= :startDate', { startDate });
+    }
+
+    if (endDate) {
+      query.andWhere('transaction.created_at <= :endDate', { endDate });
+    }
+
+    const orderField = sortBy === 'amount' ? 'transaction.amount' : 'transaction.created_at';
+    query.orderBy(orderField, sortOrder);
+
+    const [transactions, total] = await query.getManyAndCount();
+    return { transactions, total };
+  }
 }
