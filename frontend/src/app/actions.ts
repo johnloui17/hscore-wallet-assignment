@@ -6,7 +6,7 @@ import { createWallet, deleteWallet, credit, debit } from '@/lib/api';
 export async function createWalletAction(name: string, initialBalance: number) {
   try {
     const result = await createWallet(name, initialBalance);
-    revalidateTag('wallets');
+    revalidateTag('wallets', 'default');
     return { success: true, data: result };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to create wallet' };
@@ -16,7 +16,7 @@ export async function createWalletAction(name: string, initialBalance: number) {
 export async function deleteWalletAction(id: string) {
   try {
     await deleteWallet(id);
-    revalidateTag('wallets');
+    revalidateTag('wallets', 'default');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete wallet' };
@@ -26,10 +26,10 @@ export async function deleteWalletAction(id: string) {
 export async function creditAction(id: string, amount: number, category?: string) {
   try {
     const result = await credit(id, amount, category);
-    revalidateTag('wallets');
+    revalidateTag('wallets', 'default');
     // Also revalidate specific wallet balance and history if we tag them later
-    revalidateTag(`balance-${id}`);
-    revalidateTag(`history-${id}`);
+    revalidateTag(`balance-${id}`, 'default');
+    revalidateTag(`history-${id}`, 'default');
     return { success: true, data: result };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to credit wallet' };
@@ -39,9 +39,9 @@ export async function creditAction(id: string, amount: number, category?: string
 export async function debitAction(id: string, amount: number, category?: string) {
   try {
     const result = await debit(id, amount, category);
-    revalidateTag('wallets');
-    revalidateTag(`balance-${id}`);
-    revalidateTag(`history-${id}`);
+    revalidateTag('wallets', 'default');
+    revalidateTag(`balance-${id}`, 'default');
+    revalidateTag(`history-${id}`, 'default');
     return { success: true, data: result };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to debit wallet' };

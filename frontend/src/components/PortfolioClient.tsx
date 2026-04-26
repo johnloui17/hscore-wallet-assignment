@@ -363,8 +363,8 @@ const AddButton = styled(motion.button)`
 `;
 
 /* ── Helpers ── */
-const ACCENT_COLORS = ['#3b82f6', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'];
-const PLAN_NAMES = ['Standard', 'Premium', 'Gold', 'Platinum', 'Diamond'];
+const ACCENT_COLORS = ['#3b82f6', '#94a3b8', '#f59e0b', '#10b981', '#6366f1'];
+const PLAN_NAMES = ['Starter', 'Silver', 'Gold', 'Platinum', 'Black Edition'];
 
 function getAccentColor(index: number) {
   return ACCENT_COLORS[index % ACCENT_COLORS.length];

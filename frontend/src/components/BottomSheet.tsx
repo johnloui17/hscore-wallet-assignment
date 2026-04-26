@@ -16,7 +16,7 @@ const Overlay = styled(motion.div)`
   align-items: flex-end; /* Align to bottom */
 `;
 
-const Sheet = styled(motion.div)`
+const SheetContent = styled.div`
   width: 100%;
   max-width: 600px;
   background: #1e293b;
@@ -69,18 +69,20 @@ export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
-          <Sheet
-            {...bind()}
+          <motion.div
+            {...(bind() as any)}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             onClick={(e) => e.stopPropagation()}
-            style={{ y: 0 }} // useDrag updates inline style y usually, but framer-motion handles it better via AnimatePresence here. Actually, we use framer-motion for the entrance, use-gesture for the drag.
+            style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
           >
-            <HandleBar />
-            {children}
-          </Sheet>
+            <SheetContent>
+              <HandleBar />
+              {children}
+            </SheetContent>
+          </motion.div>
         </Overlay>
       )}
     </AnimatePresence>
