@@ -1,56 +1,86 @@
 # 💳 Pocket Feel — High-Integrity Digital Wallet
 
-Pocket Feel is a modern, full-stack digital wallet application designed for secure, user-scoped transaction management. It features a high-fidelity frontend built with **Next.js 15** and a robust **NestJS** backend, ensuring ACID-compliant operations and a premium user experience.
-
-![Pocket Feel Dashboard](./assets/homePage.png)
+Pocket Feel is a premium, full-stack digital wallet application designed for secure, user-scoped transaction management. Built with a "Mobile-First" philosophy, it offers a high-fidelity experience across all devices, ensuring ACID-compliant operations and intuitive financial tracking.
 
 ---
 
-## ✨ Key Features
+## 🌟 Core Product Value
 
-### 🔐 User-ID Scoped Sessions
-- **Zero-Password Entry:** Users access their wallets using a simple User ID (e.g., `ronaldo`).
-- **Secure Persistence:** Sessions are maintained via `HttpOnly` cookies and `localStorage`, ensuring data isolation without complex OAuth setups.
-- **Cross-Device Ready:** All data is associated with the User ID in the database, allowing access from any browser.
+### 🔐 Zero-Trust User Sessions
+- **Passwordless Entry:** Instant access via a simple User ID (e.g., `Ronaldo`).
+- **Secure Persistence:** Session integrity is maintained using `HttpOnly` secure cookies and `localStorage`, providing isolated data environments for every user.
+- **Data Scoping:** All API requests are strictly scoped to the User ID, preventing unauthorized cross-account data exposure.
 
-### 🛡️ Transaction Integrity
-- **ACID Compliance:** Uses TypeORM transactions to ensure balance updates and ledger entries happen atomically—no partial state even on failures.
-- **Safe Deletion:** A custom **"Safe Swipe Slider"** prevents accidental wallet deletion, requiring a deliberate drag interaction to confirm.
-- **Overdraft Protection:** Backend validation prevents debit operations that exceed the available balance.
+### 🛡️ Transactional Integrity
+- **ACID Operations:** Leveraging TypeORM transactions, every credit and debit operation is atomic. Balance updates and ledger entries succeed or fail together—never leaving your wallet in an inconsistent state.
+- **Overdraft Protection:** Robust backend validation ensures users cannot withdraw more than their available balance.
+- **Safe Wallet Deletion:** Features a custom **"Safe Swipe Slider"** confirmation to prevent accidental loss of wallet data.
 
-### 📊 Real-Time Financial Tracking
-- **Paginated Ledger:** Efficiently browse through transaction history with server-side pagination.
-- **Smart Categorization:** Tag transactions with categories like *Groceries*, *Dining*, or *Salary* for better tracking.
-- **Live Updates:** Integrated with **TanStack Query** for instant UI synchronization after every transaction.
+### 📊 Advanced Financial Audit
+- **Infinite Ledger:** Deep audit trail with paginated transaction history.
+- **Smart Categorization:** Automatically tag and organize expenses into categories like *Dining*, *Salary*, and *Utilities*.
+- **Real-Time Sync:** Powered by **TanStack Query** for instant UI updates without disruptive page reloads.
+
+---
+
+## 📸 Full Product Showcase
+
+### 🖥️ Desktop Experience
+*High-fidelity workspace designed for professional asset management.*
+
+#### **1. Authentication & Onboarding**
+| Login Page | Home (Empty) | Create Wallet |
+| :---: | :---: | :---: |
+| ![Login](./assets/desktopLoginPage.png) | ![Home Empty](./assets/desktopHomePage.png) | ![Create](./assets/desktopCreateWallet.png) |
+
+#### **2. Portfolio & Transaction Management**
+| Dashboard (Filled) | Wallet Detail | Delete Confirmation |
+| :---: | :---: | :---: |
+| ![Home Fill](./assets/desktopHomePageFill.png) | ![Wallet](./assets/desktopWalletPage.png) | ![Delete](./assets/DesktopDeleteWallet.png) |
+
+#### **3. Activity & Configuration**
+| Global Activity | Cards Overview | Settings Hub |
+| :---: | :---: | :---: |
+| ![Activity](./assets/desktopActivityPage.png) | ![Cards](./assets/desktopCardsPage.png) | ![Settings](./assets/desktopSettingsPage.png) |
+
+---
+
+### 📱 Mobile Experience
+*Thumb-friendly navigation with native-feeling interactions.*
+
+| Login | Home Screen | Wallet Cards |
+| :---: | :---: | :---: |
+| ![Mobile Login](./assets/mobileLoginPage.png) | ![Mobile Home](./assets/mobileHomePage.png) | ![Mobile Cards](./assets/mobileCardsPage.png) |
+
+| Activity Log | Swipe to Delete | Settings |
+| :---: | :---: | :---: |
+| ![Mobile Activity](./assets/mobileActivityPage.png) | ![Mobile Delete](./assets/mobileDeleteWallet.png) | ![Mobile Settings](./assets/mobileSettingsPage.png) |
 
 ---
 
 ## 🏗️ Technical Architecture
 
-### **Frontend**
-- **Framework:** Next.js 15 (App Router)
-- **State & Fetching:** TanStack Query (React Query)
-- **Styling:** Styled Components + Framer Motion (Animations)
-- **Middleware:** Custom Edge Proxy for route protection and session verification.
+### **Frontend (Next.js 15)**
+- **State Management:** TanStack Query (React Query) for robust server-state caching.
+- **Styling:** Styled Components + Framer Motion for premium animations.
+- **Authentication Proxy:** Custom middleware handling route protection and session verification.
 
-### **Backend**
-- **Framework:** NestJS (TypeScript)
-- **Database:** PostgreSQL (Production) / SQLite (Local Dev fallback)
-- **ORM:** TypeORM
-- **Validation:** `class-validator` for DTO-level request integrity.
+### **Backend (NestJS)**
+- **Database:** Dual-support for PostgreSQL (Production) and SQLite (Local Dev).
+- **ORM:** TypeORM with specialized transaction runners.
+- **Validation:** Strict DTO-level integrity checking using `class-validator`.
 
 ---
 
 ## 🚦 Getting Started
 
 ### 1. Prerequisites
-- Node.js (v18+)
-- Docker (Optional, for PostgreSQL)
+- **Node.js:** v18 or higher
+- **Docker:** Recommended for local PostgreSQL orchestration
 
-### 2. Clone & Setup Environments
+### 2. Environment Configuration
 
-#### **Backend (`/backend`)**
-Create a `.env` file:
+#### **Backend (`/backend/.env`)**
 ```env
 PORT=3001
 DB_TYPE=postgres
@@ -60,56 +90,35 @@ DB_USERNAME=postgres
 DB_PASSWORD=postgres
 DB_NAME=hscore_wallet
 ```
-*Note: To use SQLite instead, simply run with `DB_TYPE=sqlite`.*
 
-#### **Frontend (`/frontend`)**
-Create a `.env.local` file:
+#### **Frontend (`/frontend/.env.local`)**
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1/wallet
 ```
 
-### 3. Execution
-**Start Database:**
+### 3. Execution Commands
 ```bash
+# 1. Start Database (PostgreSQL)
 docker compose up -d
+
+# 2. Launch Backend
+cd backend && npm install && npm run start:dev
+
+# 3. Launch Frontend
+cd frontend && npm install && npm run dev
 ```
-
-**Launch Services:**
-```bash
-# In /backend
-npm install && npm run start:dev
-
-# In /frontend
-npm install && npm run dev
-```
+*Quick Toggle: To run without Docker, use `DB_TYPE=sqlite npm run start:dev` in the backend folder.*
 
 ---
 
-## 🌐 Deployment Instructions
+## 📘 Project Documentation
 
-### **Backend (e.g., Render / Railway)**
-1.  Connect your repository.
-2.  Set the Root Directory to `backend/`.
-3.  Add all environment variables listed above.
-4.  Build Command: `npm install && npm run build`.
-5.  Start Command: `npm run start:prod`.
+To assist with the review process, the following deep-dive docs are available:
 
-### **Frontend (e.g., Vercel)**
-1.  Connect your repository.
-2.  Set the Root Directory to `frontend/`.
-3.  Set `NEXT_PUBLIC_API_URL` to your **Live Backend URL**.
-4.  Deploy.
+- **[Detailed API Guide (API.md)](./docs/API.md)** — Full endpoint specifications and response schemas.
+- **[Frontend Flow Explanation (FRONTEND_FLOW.md)](./docs/FRONTEND_FLOW.md)** — Detailed walkthrough of the user journey.
+- **[Environment Setup Guide (ENV_SETUP.md)](./docs/ENV_SETUP.md)** — Step-by-step variable configuration.
 
 ---
 
-## 📘 API & Documentation
-
-Pocket Feel includes extensive internal documentation to assist reviewers:
-
-- **[Detailed API Documentation (API.md)](./API.md)** — Full endpoint signatures and examples.
-- **[Submission TODO Checklist (TODO.md)](./TODO.md)** — Tracking of assignment requirements.
-- **[Architectural Context (GEMINI.md)](./GEMINI.md)** — Deep dive into system-wide dependencies.
-
----
-
-*Developed with ❤️ by John Loui for the hScore Advisors Wallet Assignment.*
+*Developed by John Loui.*

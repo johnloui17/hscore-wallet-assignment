@@ -49,7 +49,29 @@ Retrieves all wallets associated with a specific user.
   - `userId` (Required): The unique ID of the user.
 - **Success Response:**
   - **Code:** `200 OK`
-  - **Content:** `Array of Wallet Objects` (includes last 10 transactions per wallet).
+  - **Content:**
+    ```json
+    [
+      {
+        "id": "uuid-string",
+        "name": "Savings Wallet",
+        "balance": 1000,
+        "user_id": "john_doe",
+        "created_at": "2026-04-27T12:00:00Z",
+        "transactions": [
+          {
+            "id": "tx-uuid",
+            "wallet_id": "uuid-string",
+            "amount": 1000,
+            "type": "CREDIT",
+            "category": "Initial Deposit",
+            "created_at": "2026-04-27T12:00:00Z"
+          }
+        ]
+      }
+    ]
+    ```
+  - *Note: The `transactions` array is limited to the last 10 records for dashboard performance.*
 
 ### 3. Get Wallet Balance
 Fetch the current balance of a specific wallet.
@@ -58,7 +80,7 @@ Fetch the current balance of a specific wallet.
 - **Method:** `GET`
 - **Success Response:**
   - **Code:** `200 OK`
-  - **Content:** `Wallet Object`
+  - **Content:** `Wallet Object` (same structure as above, but without the transactions array).
 
 ### 4. Delete Wallet
 Permanently removes a wallet and its history.
@@ -125,7 +147,17 @@ Fetch transactions for a specific wallet with pagination support.
   - **Content:**
     ```json
     {
-      "transactions": [ ... ],
+      "transactions": [
+        {
+          "id": "tx-uuid",
+          "wallet_id": "uuid-string",
+          "amount": 200,
+          "type": "DEBIT",
+          "category": "Groceries",
+          "description": "Weekly shopping",
+          "created_at": "2026-04-27T14:30:00Z"
+        }
+      ],
       "total": 45
     }
     ```
@@ -137,14 +169,35 @@ Fetch all transactions across all wallets for a specific user.
 - **Method:** `GET`
 - **Query Params:**
   - `userId` (Required): Unique ID of the user.
-  - `limit`/`offset`: Pagination controls.
+  - `limit`/`offset`: Pagination controls (Default: 10/0).
   - `type`: Filter by `CREDIT` or `DEBIT`.
   - `category`: Filter by category name.
+  - `walletId`: Filter by a specific wallet ID or multiple IDs (comma-separated).
   - `startDate`/`endDate`: Filter by ISO date strings.
-  - `sortBy`: `date` or `amount`.
-  - `sortOrder`: `ASC` or `DESC`.
+  - `sortBy`: `date` or `amount` (Default: `date`).
+  - `sortOrder`: `ASC` or `DESC` (Default: `DESC`).
 - **Success Response:**
   - **Code:** `200 OK`
+  - **Content:**
+    ```json
+    {
+      "transactions": [
+        {
+          "id": "tx-uuid",
+          "wallet_id": "uuid-string",
+          "amount": 500,
+          "type": "CREDIT",
+          "category": "Salary",
+          "created_at": "2026-04-27T12:00:00Z",
+          "wallet": {
+            "id": "uuid-string",
+            "name": "Savings Wallet"
+          }
+        }
+      ],
+      "total": 120
+    }
+    ```
 
 ---
 
