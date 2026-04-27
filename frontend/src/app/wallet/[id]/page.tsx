@@ -782,34 +782,45 @@ export default function WalletDetails() {
                   <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <HistoryHeader><HistoryTitle>Ledger</HistoryTitle></HistoryHeader>
                     <LedgerBox>
-                      {transactions.map((tx) => (
-                        <TransactionRow key={tx.id}>
-                          <TransLeft>
-                            <TransIcon $type={tx.type}>{tx.type === 'CREDIT' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}</TransIcon>
-                            <div><TransTitle>{tx.type === 'CREDIT' ? 'Funds Received' : 'Funds Withdrawn'}</TransTitle>{tx.description && <TransDesc>{tx.description}</TransDesc>}<TransSub><Calendar size={12} />{new Date(tx.created_at).toLocaleDateString()}</TransSub></div>
-                          </TransLeft>
-                          <TransAmount $type={tx.type}>{tx.type === 'CREDIT' ? '+' : '-'}{Number(tx.amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}</TransAmount>
-                        </TransactionRow>
-                      ))}
+                      {transactions.length === 0 ? (
+                        <p style={{ color: '#94a3b8', textAlign: 'center', margin: '40px 0' }}>No transactions recorded yet.</p>
+                      ) : (
+                        transactions.map((tx) => (
+                          <TransactionRow key={tx.id}>
+                            <TransLeft>
+                              <TransIcon $type={tx.type}>{tx.type === 'CREDIT' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}</TransIcon>
+                              <div><TransTitle>{tx.type === 'CREDIT' ? 'Funds Received' : 'Funds Withdrawn'}</TransTitle>{tx.description && <TransDesc>{tx.description}</TransDesc>}<TransSub><Calendar size={12} />{new Date(tx.created_at).toLocaleDateString()}</TransSub></div>
+                            </TransLeft>
+                            <TransAmount $type={tx.type}>{tx.type === 'CREDIT' ? '+' : '-'}{Number(tx.amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}</TransAmount>
+                          </TransactionRow>
+                        ))
+                      )}
                     </LedgerBox>
+                    <Pagination>
+                      <PageBtn disabled={page === 0} onClick={() => setPage((p) => p - 1)}>Previous</PageBtn>
+                      <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600 }}>{page + 1} / {totalPages || 1}</span>
+                      <PageBtn disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>Next</PageBtn>
+                    </Pagination>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <DeleteSection>
-                {!confirmDelete ? (
-                  <DeleteBtn onClick={() => setConfirmDelete(true)} whileTap={{ scale: 0.95 }}><Trash2 size={18} />Delete Wallet</DeleteBtn>
-                ) : (
-                  <ConfirmDeleteBox initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                    <AlertCircle size={32} color="#ef4444" />
-                    <div><h4 style={{ color: 'white', margin: '0 0 4px 0' }}>Are you sure?</h4><p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>This action cannot be undone.</p></div>
-                    <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
-                      <SubmitButton $type="credit" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }} onClick={() => setConfirmDelete(false)}>Cancel</SubmitButton>
-                      <SubmitButton $type="debit" onClick={handleDelete} disabled={isDeleting}>{isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete'}</SubmitButton>
-                    </div>
-                  </ConfirmDeleteBox>
-                )}
-              </DeleteSection>
+              {viewMode !== 'history' && (
+                <DeleteSection>
+                  {!confirmDelete ? (
+                    <DeleteBtn onClick={() => setConfirmDelete(true)} whileTap={{ scale: 0.95 }}><Trash2 size={18} />Delete Wallet</DeleteBtn>
+                  ) : (
+                    <ConfirmDeleteBox initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                      <AlertCircle size={32} color="#ef4444" />
+                      <div><h4 style={{ color: 'white', margin: '0 0 4px 0' }}>Are you sure?</h4><p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>This action cannot be undone.</p></div>
+                      <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
+                        <SubmitButton $type="credit" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }} onClick={() => setConfirmDelete(false)}>Cancel</SubmitButton>
+                        <SubmitButton $type="debit" onClick={handleDelete} disabled={isDeleting}>{isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete'}</SubmitButton>
+                      </div>
+                    </ConfirmDeleteBox>
+                  )}
+                </DeleteSection>
+              )}
             </ActionHub>
           </ActionPane>
 

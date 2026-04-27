@@ -664,7 +664,7 @@ export function PortfolioClient() {
     setUserId(storedUserId);
   }, []);
 
-  const { data: wallets = [], isLoading, isError } = useQuery({
+  const { data: wallets = [] as WalletData[], isLoading, isError } = useQuery<WalletData[]>({
     queryKey: ['wallets', userId],
     queryFn: () => getAllWallets(userId || undefined),
     enabled: userId !== null, // Only run query once userId is available
@@ -676,7 +676,7 @@ export function PortfolioClient() {
   const newestCardRef = useRef<HTMLDivElement>(null);
   const prevWalletsCount = useRef(wallets.length);
 
-  const totalValue = wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0);
+  const totalValue = wallets.reduce((sum: number, w: any) => sum + Number(w.balance || 0), 0);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
