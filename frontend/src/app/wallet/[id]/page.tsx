@@ -6,22 +6,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBalance, credit, debit, getHistory } from '@/lib/api';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  ChevronLeft,
-  ArrowUpCircle,
-  ArrowDownCircle,
-  TrendingUp,
-  TrendingDown,
-  ShoppingBag,
-  FileText,
-  Utensils,
-  Film,
-  Plane,
-  Briefcase,
-  Loader2,
-  Calendar,
-  History as HistoryIcon,
-  CheckCircle2,
+import { 
+  ChevronLeft, 
+  ArrowUpCircle, 
+  ArrowDownCircle, 
+  TrendingUp, 
+  TrendingDown, 
+  ShoppingBag, 
+  FileText, 
+  Utensils, 
+  Film, 
+  Plane, 
+  Briefcase, 
+  Loader2, 
+  Calendar, 
+  History as HistoryIcon, 
+  CheckCircle2, 
   X,
   AlignLeft,
   Trash2,
@@ -30,7 +30,9 @@ import {
   Activity as ActivityIcon,
   CreditCard,
   Settings as SettingsIcon,
-  Plus
+  Plus,
+  ShieldCheck,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { deleteWalletAction } from '@/app/actions';
@@ -194,6 +196,20 @@ const HeaderSection = styled.div`
     align-items: center;
     margin-bottom: 40px;
     padding-top: 60px;
+    position: relative;
+    width: 100%;
+  }
+`;
+
+const HeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (min-width: 1024px) {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 `;
 
@@ -231,6 +247,37 @@ const WalletTitle = styled.h1`
   }
 `;
 
+const DesktopStatus = styled.div`
+  display: none;
+  @media (min-width: 1024px) { 
+    display: flex; 
+    align-items: center; 
+    gap: 24px;
+    position: absolute;
+    right: 0;
+  }
+`;
+
+const StatusItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+`;
+
+const StatusLabel = styled.span`
+  font-size: 0.6rem;
+  color: #475569;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+`;
+
+const StatusValue = styled.div`
+  display: flex; align-items: center; gap: 6px; color: #f1f5f9; font-size: 0.85rem; font-weight: 700;
+  svg { color: #10b981; }
+`;
+
 const BalanceCard = styled(motion.div)`
   text-align: center;
   margin-bottom: 32px;
@@ -240,20 +287,53 @@ const BalanceCard = styled(motion.div)`
   box-shadow: 0 15px 30px -10px rgba(37, 99, 235, 0.4);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+
   &::after {
-    content: ''; position: absolute; top: -50%; right: -20%; width: 150px; height: 150px;
-    background: rgba(255, 255, 255, 0.1); border-radius: 50%;
+    content: ''; 
+    position: absolute; 
+    top: -50%; 
+    right: -20%; 
+    width: 150px; 
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1); 
+    border-radius: 50%;
+    z-index: 0;
   }
-  @media (min-width: 1024px) { padding: 48px 40px; border-radius: 40px; width: 100%; margin-bottom: 40px; }
+
+  @media (min-width: 1024px) { 
+    padding: 48px 40px; 
+    border-radius: 40px; 
+    width: 100%; 
+    margin-bottom: 40px;
+    min-height: 200px;
+  }
 `;
 
 const BalanceLabel = styled.p`
-  font-size: 0.75rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px;
-  text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;
+  font-size: 0.75rem; 
+  color: rgba(255, 255, 255, 0.8); 
+  margin-bottom: 8px;
+  text-transform: uppercase; 
+  letter-spacing: 1.5px; 
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
 `;
 
 const BalanceAmount = styled.h2`
-  font-size: 3.2rem; margin: 0; font-weight: 800; color: #fff; letter-spacing: -1px;
+  font-size: 3.2rem; 
+  margin: 0; 
+  font-weight: 800; 
+  color: #fff; 
+  letter-spacing: -1px;
+  position: relative;
+  z-index: 1;
+
   @media (max-width: 400px) { font-size: 2.6rem; }
   @media (min-width: 1024px) { font-size: 4rem; }
 `;
@@ -274,7 +354,7 @@ const DesktopActionGrid = styled.div`
   }
 `;
 
-const ActionCard = styled(motion.button) <{ $active: boolean; $color: string }>`
+const ActionCard = styled(motion.button)<{ $active: boolean; $color: string }>`
   background: ${props => props.$active ? props.$color + '15' : 'rgba(30, 41, 59, 0.4)'};
   border: 1px solid ${props => props.$active ? props.$color : 'rgba(255, 255, 255, 0.05)'};
   border-radius: 24px;
@@ -299,7 +379,7 @@ const ChoiceGrid = styled.div`
   @media (min-width: 1024px) { display: none; }
 `;
 
-const ChoiceCard = styled(motion.button) <{ $variant?: 'ledger' | 'credit' | 'debit'; $fullWidth?: boolean }>`
+const ChoiceCard = styled(motion.button)<{ $variant?: 'ledger' | 'credit' | 'debit'; $fullWidth?: boolean }>`
   background: rgba(30, 41, 59, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
@@ -317,12 +397,12 @@ const ChoiceCard = styled(motion.button) <{ $variant?: 'ledger' | 'credit' | 'de
   &:hover {
     background: rgba(30, 41, 59, 0.7);
     border-color: ${({ $variant }) =>
-    $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
   }
 
   svg {
     color: ${({ $variant }) =>
-    $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
     width: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
     height: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
   }
@@ -365,7 +445,7 @@ const DescriptionInput = styled(Input)`
   font-size: 1rem; font-weight: 600; padding: 18px 20px 18px 48px;
 `;
 
-const SubmitButton = styled(motion.button) <{ $type: 'credit' | 'debit' }>`
+const SubmitButton = styled(motion.button)<{ $type: 'credit' | 'debit' }>`
   width: 100%; padding: 20px; border-radius: 20px; font-weight: 700; font-size: 1.1rem;
   display: flex; justify-content: center; align-items: center; gap: 10px;
   cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 1px;
@@ -383,7 +463,7 @@ const CategoryLabel = styled.p`
   text-align: center; text-transform: uppercase; letter-spacing: 1px;
 `;
 
-const IconBtn = styled(motion.button) <{ $active: boolean }>`
+const IconBtn = styled(motion.button)<{ $active: boolean }>`
   background: ${({ $active }) => ($active ? 'rgba(59, 130, 246, 0.2)' : 'rgba(30, 41, 59, 0.5)')};
   border: 1px solid ${({ $active }) => ($active ? '#3b82f6' : 'rgba(255, 255, 255, 0.05)')};
   color: ${({ $active }) => ($active ? '#3b82f6' : '#64748b')};
@@ -446,7 +526,22 @@ const ConfirmDeleteBox = styled(motion.div)`
   @media (min-width: 1024px) { width: 400px; }
 `;
 
-/* ── Nav & Success UI ── */
+/* ── Success Modal UI ── */
+const ModalOverlay = styled(motion.div)`
+  position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);
+  z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
+`;
+
+const ModalContent = styled(motion.div)`
+  width: 100%; max-width: 400px; background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px; padding: 40px 24px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;
+`;
+
+const SuccessMessage = styled.h2` font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.5px; `;
+const SuccessSubMessage = styled.p` color: #94a3b8; font-size: 1rem; font-weight: 500; line-height: 1.5; `;
+
+/* ── Nav UI ── */
 const Footer = styled.nav`
   position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px 12px 12px;
   display: flex; justify-content: space-around; align-items: center;
@@ -482,20 +577,6 @@ const PageBtn = styled.button`
   &:disabled { opacity: 0.25; cursor: not-allowed; }
   &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
 `;
-
-const ModalOverlay = styled(motion.div)`
-  position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);
-  z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
-`;
-
-const ModalContent = styled(motion.div)`
-  width: 100%; max-width: 400px; background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px; padding: 40px 24px;
-  display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;
-`;
-
-const SuccessMessage = styled.h2` font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.5px; `;
-const SuccessSubMessage = styled.p` color: #94a3b8; font-size: 1rem; font-weight: 500; line-height: 1.5; `;
 
 const MobileOnly = styled.div` display: block; @media (min-width: 1024px) { display: none; } `;
 
@@ -630,8 +711,14 @@ export default function WalletDetails() {
         <WorkspaceGrid>
           <ActionPane>
             <HeaderSection>
-              <BackBtn whileHover={{ x: -4 }} onClick={handleBack}><ChevronLeft size={18} />{window.innerWidth >= 1024 ? 'Dashboard' : (viewMode === 'choice' ? 'Dashboard' : 'Options')}</BackBtn>
-              <WalletTitle>{balanceData?.name || 'Vault Details'}</WalletTitle>
+              <HeaderRow>
+                <BackBtn whileHover={{ x: -4 }} onClick={handleBack}><ChevronLeft size={18} />{window.innerWidth >= 1024 ? 'Dashboard' : (viewMode === 'choice' ? 'Dashboard' : 'Options')}</BackBtn>
+                <WalletTitle>{balanceData?.name || 'Vault Details'}</WalletTitle>
+              </HeaderRow>
+              <DesktopStatus>
+                <StatusItem><StatusLabel>Identity</StatusLabel><StatusValue><ShieldCheck size={14} />Verified</StatusValue></StatusItem>
+                <StatusItem><StatusLabel>Network</StatusLabel><StatusValue><RefreshCw size={14} />System Live</StatusValue></StatusItem>
+              </DesktopStatus>
             </HeaderSection>
 
             <BalanceCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -744,13 +831,11 @@ export default function WalletDetails() {
                 ))
               )}
             </LedgerBox>
-            {totalPages > 1 && (
-              <Pagination>
-                <PageBtn disabled={page === 0} onClick={() => setPage((p) => p - 1)}>Previous</PageBtn>
-                <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600 }}>{page + 1} / {totalPages}</span>
-                <PageBtn disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>Next</PageBtn>
-              </Pagination>
-            )}
+            <Pagination>
+              <PageBtn disabled={page === 0} onClick={() => setPage((p) => p - 1)}>Previous</PageBtn>
+              <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600 }}>{page + 1} / {totalPages || 1}</span>
+              <PageBtn disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>Next</PageBtn>
+            </Pagination>
           </LedgerPane>
         </WorkspaceGrid>
 

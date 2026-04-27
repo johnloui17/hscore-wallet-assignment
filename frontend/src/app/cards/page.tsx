@@ -4,11 +4,11 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { 
-  Home, 
-  Activity as ActivityIcon, 
-  CreditCard as CreditCardIcon, 
-  Settings, 
+import {
+  Home,
+  Activity as ActivityIcon,
+  CreditCard as CreditCardIcon,
+  Settings,
   Plus,
   ShieldCheck,
   Zap,
@@ -232,7 +232,7 @@ const CardsGrid = styled.div`
   }
 `;
 
-const CardContainer = styled(motion.div)<{ $bg: string; $color: string }>`
+const CardContainer = styled(motion.div) <{ $bg: string; $color: string }>`
   width: 100%;
   aspect-ratio: 1.586 / 1;
   background: ${props => props.$bg};
@@ -487,8 +487,8 @@ export default function CardsPage() {
 
           <CardsGrid>
             {/* Elysian Black Card */}
-            <CardContainer 
-              $bg="linear-gradient(145deg, #0f172a 0%, #020617 100%)" 
+            <CardContainer
+              $bg="linear-gradient(145deg, #0f172a 0%, #020617 100%)"
               $color="#f8fafc"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -503,7 +503,7 @@ export default function CardsPage() {
                 </CardBrand>
                 <Cpu size={32} strokeWidth={1.5} style={{ opacity: 0.6 }} />
               </CardTop>
-              
+
               <div>
                 <Chip />
                 <div style={{ marginTop: '24px' }}>
@@ -514,15 +514,15 @@ export default function CardsPage() {
               <CardBottom>
                 <HolderInfo>
                   <Label>Valued Member</Label>
-                  <HolderName>JOHN DOE</HolderName>
+                  <HolderName>Ronaldo KK</HolderName>
                 </HolderInfo>
                 <PremiumBadge>PRIME</PremiumBadge>
               </CardBottom>
             </CardContainer>
 
             {/* Obsidian Onyx Card */}
-            <CardContainer 
-              $bg="linear-gradient(145deg, #1e293b 0%, #000000 100%)" 
+            <CardContainer
+              $bg="linear-gradient(145deg, #1e293b 0%, #000000 100%)"
               $color="#94a3b8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
