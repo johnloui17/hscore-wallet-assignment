@@ -6,17 +6,23 @@ import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Security Headers
-  app.use(helmet());
+  // Security Headers with CORS-friendly configuration
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }));
 
   // Enable CORS
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   app.enableCors({
-    origin: frontendUrl ? [frontendUrl] : true,
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow all origins to reflect back, which is necessary when credentials is true
+      callback(null, true);
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization',
+    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
+    exposedHeaders: 'Set-Cookie',
   });
+
 
   // Enable validation pipe globally
   app.useGlobalPipes(new ValidationPipe({
