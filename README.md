@@ -24,6 +24,18 @@ Pocket Feel is a modern, high-integrity full-stack digital wallet application. I
 
 ---
 
+## 🎨 Frontend Flow & User Session
+
+Pocket Feel implements a streamlined "User ID Session" as per the assignment requirements, avoiding complex password-based authentication while ensuring data persistence.
+
+1.  **Entry:** Upon first visit, the user is redirected to the `/login` page.
+2.  **Session Initiation:** Users enter a simple **User ID** (e.g., "john"). This ID is stored in a secure `HttpOnly` cookie and `localStorage`.
+3.  **Persistence:** The application uses this ID to scope all wallet operations. The session is preserved across page refreshes and browser restarts until the user explicitly logs out.
+4.  **Data Isolation:** The backend uses the `userId` to ensure users only see and manage their own vaults.
+5.  **Logout:** Signing out clears the stored session tokens and redirects the user back to the login screen.
+
+---
+
 ## 🛠 Tech Stack
 
 - **Frontend:** Next.js 15, React 19, Styled Components, TanStack Query.
@@ -33,23 +45,43 @@ Pocket Feel is a modern, high-integrity full-stack digital wallet application. I
 
 ---
 
-## 🚦 Getting Started
+## 🚦 Getting Started & Environment Setup
 
-### 1. Database Setup (PostgreSQL)
+### 1. Environment Variables (`.env`)
+
+#### Backend (`backend/.env`)
+Create a `.env` file in the `backend/` directory with the following:
+```env
+PORT=3001
+DB_TYPE=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=hscore_wallet
+```
+
+#### Frontend (`frontend/.env.local`)
+Create a `.env.local` file in the `frontend/` directory:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1/wallet
+```
+
+### 2. Database Setup (PostgreSQL)
 The project defaults to PostgreSQL. The recommended way to run it is via **Docker**:
 ```bash
 docker compose up -d
 ```
 *Alternatively, you can use local PostgreSQL via Homebrew (`brew services start postgresql@15`).*
 
-### 2. Run Backend
+### 3. Run Backend
 ```bash
 cd backend
 npm install
 npm run start:dev
 ```
 
-### 3. Run Frontend
+### 4. Run Frontend
 ```bash
 cd frontend
 npm install
@@ -58,12 +90,17 @@ npm run dev
 
 ---
 
-## 🔄 Database Toggle (Local Dev)
+## 🔄 Database Toggle & Migrations
+
+### Local SQLite Development
 If you prefer not to use PostgreSQL/Docker, you can switch to **SQLite** instantly:
 ```bash
 cd backend && DB_TYPE=sqlite npm run start:dev
 ```
-This will create a local `database.sqlite` file in the backend directory.
+This will create a local `database.sqlite` file.
+
+### Schema Synchronization
+The application uses TypeORM's `synchronize: true` in development mode to automatically handle schema updates and migrations based on the TypeScript entities. For production, this is disabled to ensure data safety.
 
 ---
 
@@ -86,14 +123,19 @@ When deploying this project to the internet (e.g., Vercel, Render, Railway), con
 
 ## 📘 API Reference (v1)
 
-| Endpoint | Method | Description |
-| :--- | :--- | :--- |
-| `/api/v1/wallet` | `GET` | Fetch all wallets |
-| `/api/v1/wallet` | `POST` | Create a new wallet |
-| `/api/v1/wallet/:id` | `GET` | Get current balance |
-| `/api/v1/wallet/:id/credit` | `POST` | Deposit funds |
-| `/api/v1/wallet/:id/debit` | `POST` | Withdraw funds |
-| `/api/v1/wallet/:id/history` | `GET` | Fetch transaction ledger |
+Pocket Feel provides a comprehensive RESTful API for managing wallets and transactions.
+
+**[See Detailed API Documentation (API.md)](./API.md)**
+
+| Endpoint | Method | Parameters | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/v1/wallet` | `GET` | `?userId={id}` | Fetch all wallets for a user |
+| `/api/v1/wallet` | `POST` | `userId`, `name`, `initialBalance` | Create a new wallet |
+| `/api/v1/wallet/:id` | `GET` | — | Get current balance |
+| `/api/v1/wallet/:id/credit` | `POST` | `amount`, `category`, `description` | Deposit funds |
+| `/api/v1/wallet/:id/debit` | `POST` | `amount`, `category`, `description` | Withdraw funds |
+| `/api/v1/wallet/:id/history` | `GET` | `?limit=10&offset=0` | Fetch paginated ledger |
+| `/api/v1/wallet/transactions/all` | `GET` | `?userId={id}` | Global activity feed |
 
 ---
 
