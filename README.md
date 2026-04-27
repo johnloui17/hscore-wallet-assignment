@@ -115,10 +115,8 @@ cd frontend && npm install && npm run dev
 
 To assist with the review process, the following deep-dive docs are available:
 
-- **[Detailed API Guide (API.md)](./API.md)** — Full endpoint specifications and response schemas.
-- **[Submission Checklist (TODO.md)](./TODO.md)** — Alignment with hScore assignment requirements.
-- **[System Architecture (GEMINI.md)](./GEMINI.md)** — Overview of project structure and dependencies.
+- **[Detailed API Guide (API.md)](./docs/API.md)** — Full endpoint specifications and response schemas.
 
 ---
 
-*Developed with ❤️ by John Loui for the hScore Advisors Full-Stack Assignment.*
+*Developed by John Loui.*

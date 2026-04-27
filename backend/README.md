@@ -57,18 +57,27 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deployment
+## 🚀 Deployment (Render)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+This backend is optimized for deployment on **Render** as a Web Service.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 1. Configuration
+- **Runtime:** Node.js
+- **Build Command:** `npm install && npm run build`
+- **Start Command:** `npm run start:prod`
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+### 2. Environment Variables
+Ensure the following variables are set in your Render dashboard:
+- `NODE_ENV`: `production`
+- `DB_TYPE`: `postgres`
+- `DB_HOST`: Your database host
+- `DB_PORT`: `5432`
+- `DB_USERNAME`: Your database user
+- `DB_PASSWORD`: Your database password
+- `DB_NAME`: Your database name
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 3. Database Sync
+In production, `synchronize: true` is disabled for safety. Ensure your database schema is initialized before starting the service.
 
 ## Resources
 
@@ -87,11 +96,6 @@ Check out a few resources that may come in handy when working with NestJS:
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
