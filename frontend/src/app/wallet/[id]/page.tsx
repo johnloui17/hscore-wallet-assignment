@@ -526,22 +526,7 @@ const ConfirmDeleteBox = styled(motion.div)`
   @media (min-width: 1024px) { width: 400px; }
 `;
 
-/* ── Success Modal UI ── */
-const ModalOverlay = styled(motion.div)`
-  position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);
-  z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
-`;
-
-const ModalContent = styled(motion.div)`
-  width: 100%; max-width: 400px; background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px; padding: 40px 24px;
-  display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;
-`;
-
-const SuccessMessage = styled.h2` font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.5px; `;
-const SuccessSubMessage = styled.p` color: #94a3b8; font-size: 1rem; font-weight: 500; line-height: 1.5; `;
-
-/* ── Nav UI ── */
+/* ── Nav & Success UI ── */
 const Footer = styled.nav`
   position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px 12px 12px;
   display: flex; justify-content: space-around; align-items: center;
@@ -578,6 +563,20 @@ const PageBtn = styled.button`
   &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
 `;
 
+const ModalOverlay = styled(motion.div)`
+  position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);
+  z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
+`;
+
+const ModalContent = styled(motion.div)`
+  width: 100%; max-width: 400px; background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px; padding: 40px 24px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;
+`;
+
+const SuccessMessage = styled.h2` font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.5px; `;
+const SuccessSubMessage = styled.p` color: #94a3b8; font-size: 1rem; font-weight: 500; line-height: 1.5; `;
+
 const MobileOnly = styled.div` display: block; @media (min-width: 1024px) { display: none; } `;
 
 export default function WalletDetails() {
@@ -586,6 +585,7 @@ export default function WalletDetails() {
   const queryClient = useQueryClient();
   const walletId = params.id as string;
 
+  const [isDesktop, setIsDesktop] = useState(false);
   const [viewMode, setViewMode] = useState<'choice' | 'amount' | 'history'>('choice');
   const [txType, setTxType] = useState<'credit' | 'debit' | null>(null);
   const [amountInput, setAmountInput] = useState('');
@@ -615,10 +615,14 @@ export default function WalletDetails() {
   }, [successModal.visible]);
 
   useEffect(() => {
-    const handleResize = () => { if (window.innerWidth >= 1024) { setViewMode('amount'); } };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const checkDesktop = () => {
+      const desktop = window.innerWidth >= 1024;
+      setIsDesktop(desktop);
+      if (desktop) { setViewMode('amount'); }
+    };
+    checkDesktop(); // Call once on mount
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -681,7 +685,7 @@ export default function WalletDetails() {
   };
 
   const handleBack = () => {
-    if (viewMode === 'choice' || window.innerWidth >= 1024) router.push('/');
+    if (viewMode === 'choice' || isDesktop) router.push('/');
     else setViewMode('choice');
   };
 
@@ -712,7 +716,7 @@ export default function WalletDetails() {
           <ActionPane>
             <HeaderSection>
               <HeaderRow>
-                <BackBtn whileHover={{ x: -4 }} onClick={handleBack}><ChevronLeft size={18} />{window.innerWidth >= 1024 ? 'Dashboard' : (viewMode === 'choice' ? 'Dashboard' : 'Options')}</BackBtn>
+                <BackBtn whileHover={{ x: -4 }} onClick={handleBack}><ChevronLeft size={18} />{isDesktop ? 'Dashboard' : (viewMode === 'choice' ? 'Dashboard' : 'Options')}</BackBtn>
                 <WalletTitle>{balanceData?.name || 'Vault Details'}</WalletTitle>
               </HeaderRow>
               <DesktopStatus>

@@ -692,6 +692,7 @@ const MobileOnly = styled.div`
 
 export function PortfolioClient({ wallets }: PortfolioClientProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const router = useRouter();
   const newestCardRef = useRef<HTMLDivElement>(null);
   const prevWalletsCount = useRef(wallets.length);
@@ -699,15 +700,22 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
   const totalValue = wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0);
 
   useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize(); // Call it once to initialize correctly on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     if (wallets.length > prevWalletsCount.current) {
-      if (window.innerWidth >= 1024 && newestCardRef.current) {
+      if (isDesktop && newestCardRef.current) {
         setTimeout(() => {
           newestCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 500);
       }
     }
     prevWalletsCount.current = wallets.length;
-  }, [wallets]);
+  }, [wallets, isDesktop]);
 
   return (
     <Page>
