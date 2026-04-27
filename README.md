@@ -117,6 +117,7 @@ To assist with the review process, the following deep-dive docs are available:
 
 - **[Detailed API Guide (API.md)](./API.md)** — Full endpoint specifications and response schemas.
 - **[Frontend Flow Explanation (FRONTEND_FLOW.md)](./FRONTEND_FLOW.md)** — Detailed walkthrough of the user journey.
+- **[Environment Setup Guide (ENV_SETUP.md)](./ENV_SETUP.md)** — Step-by-step variable configuration.
 - **[Submission Checklist (TODO.md)](./TODO.md)** — Alignment with hScore assignment requirements.
 - **[System Architecture (GEMINI.md)](./GEMINI.md)** — Overview of project structure and dependencies.
 
