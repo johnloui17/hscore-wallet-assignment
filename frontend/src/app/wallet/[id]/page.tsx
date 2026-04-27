@@ -745,12 +745,15 @@ export default function WalletDetails() {
   const isPending = creditMutation.isPending || debitMutation.isPending;
 
   // Swipe Slider Logic
+  const constraintsRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const sliderOpacity = useTransform(x, [0, 150], [1, 0]);
   const handleColor = useTransform(x, [0, 240], ['#ef4444', '#10b981']);
 
   const onSwipeEnd = (_: any, info: any) => {
-    if (info.offset.x > 200) {
+    // If we've swiped more than 70% of the available width
+    const threshold = (constraintsRef.current?.offsetWidth || 300) * 0.7;
+    if (x.get() > threshold) {
       handleDelete();
     } else {
       x.set(0);
@@ -950,13 +953,13 @@ export default function WalletDetails() {
               <SuccessMessage>Delete Vault?</SuccessMessage>
               <SuccessSubMessage>This will permanently remove <b>{balanceData?.name}</b> and all its transaction history.</SuccessSubMessage>
               
-              <SliderTrack>
+              <SliderTrack ref={constraintsRef}>
                 <SliderLabel style={{ opacity: sliderOpacity }}>
                   Swipe to confirm
                 </SliderLabel>
                 <SliderHandle
                   drag="x"
-                  dragConstraints={{ left: 0, right: 280 }}
+                  dragConstraints={constraintsRef}
                   dragElastic={0.1}
                   onDragEnd={onSwipeEnd}
                   style={{ x, backgroundColor: handleColor }}
