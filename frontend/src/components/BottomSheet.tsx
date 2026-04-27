@@ -97,7 +97,7 @@ export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
             exit={{ y: '100%', opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             onClick={(e) => e.stopPropagation()}
-            style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+            style={{ width: '100%', display: 'flex', justifyContent: 'center', touchAction: 'none' }}
           >
             <SheetContent>
               <HandleBar />

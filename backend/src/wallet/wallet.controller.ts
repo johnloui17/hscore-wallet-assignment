@@ -9,12 +9,12 @@ export class WalletController {
 
   @Post()
   async create(@Body() createDto: CreateWalletDto) {
-    return this.walletService.createWallet(createDto.name, createDto.initialBalance);
+    return this.walletService.createWallet(createDto.name, createDto.initialBalance, createDto.userId);
   }
 
   @Get()
-  async getAll() {
-    return this.walletService.getAllWallets();
+  async getAll(@Query('userId') userId?: string) {
+    return this.walletService.getAllWallets(userId);
   }
 
   @Delete(':id')
@@ -57,6 +57,7 @@ export class WalletController {
     @Query('sortBy') sortBy: 'date' | 'amount' = 'date',
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'DESC',
     @Query('walletId') walletId?: string | string[],
+    @Query('userId') userId?: string,
   ) {
     const walletIds = Array.isArray(walletId) 
       ? walletId 
@@ -72,6 +73,7 @@ export class WalletController {
       sortBy,
       sortOrder,
       walletIds,
+      userId,
     );
   }
 }

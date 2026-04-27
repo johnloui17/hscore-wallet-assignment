@@ -9,4 +9,8 @@ export class CreateWalletDto {
   @Min(0)
   @IsOptional()
   initialBalance?: number;
+
+  @IsString()
+  @IsOptional()
+  userId?: string;
 }

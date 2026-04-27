@@ -3,11 +3,11 @@
 import { revalidateTag } from 'next/cache';
 import { createWallet, deleteWallet, credit, debit } from '@/lib/api';
 
-export async function createWalletAction(name: string, initialBalance: number) {
+export async function createWalletAction(name: string, initialBalance: number, userId?: string) {
   try {
-    const result = await createWallet(name, initialBalance);
-    revalidateTag('wallets', 'default');
-    revalidateTag('all-activity', 'default');
+    const result = await createWallet(name, initialBalance, userId);
+    revalidateTag('wallets');
+    revalidateTag('all-activity');
     return { success: true, data: result };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to create wallet';

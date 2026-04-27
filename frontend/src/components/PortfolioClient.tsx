@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
@@ -43,48 +43,51 @@ interface PortfolioClientProps {
 
 /* ── Desktop Sparkline (Dynamic) ── */
 function Sparkline({ transactions, currentBalance, color }: { transactions: TransactionShort[], currentBalance: number, color: string }) {
-  const dataPoints: number[] = [currentBalance];
-  let runningBalance = currentBalance;
+  const pathData = useMemo(() => {
+    const dataPoints: number[] = [currentBalance];
+    let runningBalance = currentBalance;
 
-  const sortedTx = [...(transactions || [])].sort((a, b) =>
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+    const sortedTx = [...(transactions || [])].sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
-  for (const tx of sortedTx) {
-    if (tx.type === 'CREDIT') {
-      runningBalance -= Number(tx.amount);
-    } else {
-      runningBalance += Number(tx.amount);
+    for (const tx of sortedTx) {
+      if (tx.type === 'CREDIT') {
+        runningBalance -= Number(tx.amount);
+      } else {
+        runningBalance += Number(tx.amount);
+      }
+      dataPoints.unshift(runningBalance);
     }
-    dataPoints.unshift(runningBalance);
-  }
 
-  if (dataPoints.length < 2) {
-    dataPoints.unshift(currentBalance);
-  }
+    if (dataPoints.length < 2) {
+      dataPoints.unshift(currentBalance);
+    }
 
-  const min = Math.min(...dataPoints);
-  const max = Math.max(...dataPoints);
-  const range = max - min || 1;
+    const min = Math.min(...dataPoints);
+    const max = Math.max(...dataPoints);
+    const range = max - min || 1;
 
-  const points = dataPoints.map((val, i) => ({
-    x: (i / (dataPoints.length - 1)) * 100,
-    y: 35 - ((val - min) / range) * 30
-  }));
+    const points = dataPoints.map((val, i) => ({
+      x: (i / (dataPoints.length - 1)) * 100,
+      y: 35 - ((val - min) / range) * 30
+    }));
 
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const curr = points[i];
-    const next = points[i + 1];
-    const cp1x = curr.x + (next.x - curr.x) / 2;
-    const cp2x = curr.x + (next.x - curr.x) / 2;
-    d += ` C ${cp1x} ${curr.y}, ${cp2x} ${next.y}, ${next.x} ${next.y}`;
-  }
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const curr = points[i];
+      const next = points[i + 1];
+      const cp1x = curr.x + (next.x - curr.x) / 2;
+      const cp2x = curr.x + (next.x - curr.x) / 2;
+      d += ` C ${cp1x} ${curr.y}, ${cp2x} ${next.y}, ${next.x} ${next.y}`;
+    }
+    return d;
+  }, [transactions, currentBalance]);
 
   return (
     <svg width="100%" height="40" viewBox="0 0 100 40" preserveAspectRatio="none" style={{ filter: 'drop-shadow(0 0 4px ' + color + '40)' }}>
       <motion.path
-        d={d}
+        d={pathData}
         fill="none"
         stroke={color}
         strokeWidth="2.5"
@@ -653,9 +656,18 @@ const MobileOnly = styled.div`
 `;
 
 export function PortfolioClient() {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedUserId = localStorage.getItem('pocketfeel_user_id');
+    setUserId(storedUserId);
+  }, []);
+
   const { data: wallets = [], isLoading, isError } = useQuery({
-    queryKey: ['wallets'],
-    queryFn: getAllWallets,
+    queryKey: ['wallets', userId],
+    queryFn: () => getAllWallets(userId || undefined),
+    enabled: userId !== null, // Only run query once userId is available
   });
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -678,13 +690,13 @@ export function PortfolioClient() {
       if (isDesktop && newestCardRef.current) {
         setTimeout(() => {
           newestCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
+        }, 100);
       }
     }
     prevWalletsCount.current = wallets.length;
   }, [wallets, isDesktop]);
 
-  if (isLoading) {
+  if (userId === null || isLoading) {
     return (
       <PageLoader />
     );
@@ -692,7 +704,39 @@ export function PortfolioClient() {
 
   if (isError) {
     return (
-      <PageLoader />
+      <Page>
+        <div style={{
+          height: '100dvh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '24px',
+          color: 'white',
+          textAlign: 'center',
+          padding: '24px'
+        }}>
+          <VaultLogo size={64} />
+          <div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Failed to load vaults</h2>
+            <p style={{ color: '#94a3b8' }}>Please check your connection and try again.</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '12px 24px',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '16px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </Page>
     );
   }
 
@@ -783,7 +827,7 @@ export function PortfolioClient() {
               </SummaryValue>
               <UserName>
                 <User size={20} />
-                Ronaldo KK
+                {userId || 'User'}
               </UserName>
             </SummaryCardContainer>
 
@@ -812,7 +856,7 @@ export function PortfolioClient() {
               </SummaryValue>
               <UserName>
                 <User size={20} />
-                Ronaldo KK
+                {userId || 'User'}
               </UserName>
             </SummaryCardContainer>
           </MobileOnly>
@@ -862,11 +906,7 @@ export function PortfolioClient() {
                           maximumFractionDigits: 0,
                         })}
                       </CardBalance>
-                      <CardBottom>
-                        <PlanIndicator $color={getAccentColor(index)}>
-                          {getPlanName()}
-                        </PlanIndicator>
-                      </CardBottom>
+
                     </div>
                   </WalletInfoCard>
                 ))}

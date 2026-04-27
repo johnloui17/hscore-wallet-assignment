@@ -8,6 +8,7 @@ import { Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Title = styled.h2`
   margin: 0 0 24px 0;
@@ -127,6 +128,7 @@ interface CreateWalletBottomSheetProps {
 
 export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomSheetProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
   const [isPending, setIsPending] = useState(false);
@@ -155,15 +157,21 @@ export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomS
       toast.error('Please enter a wallet name');
       return;
     }
-    
+
     setIsPending(true);
     const initialBal = Number(balance.replace(/,/g, '')) || 0;
-    
-    const result = await createWalletAction(name.trim(), initialBal);
-    
-    if (result.success) {
+    const userId = localStorage.getItem('pocketfeel_user_id') || undefined;
+
+    const result = await createWalletAction(name.trim(), initialBal, userId);
+
+    if (result.success && result.data) {
+      queryClient.invalidateQueries({ queryKey: ['wallets'] });
       setShowSuccess(true);
-      router.refresh();
+      // Navigate to the home page after a short delay (let success screen show)
+      setTimeout(() => {
+        router.push('/');
+        handleClose();
+      }, 2000);
     } else {
       toast.error(result.error);
     }
@@ -201,7 +209,7 @@ export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomS
             exit={{ opacity: 0 }}
           >
             <Title>Create New Wallet</Title>
-            
+
             <InputGroup>
               <Label>Wallet Name</Label>
               <Input
@@ -242,7 +250,7 @@ export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomS
             <SuccessTitle>Wallet Created!</SuccessTitle>
             <SuccessSub>Your new vault <b>{name}</b> is ready for use.</SuccessSub>
 
-            <SubmitButton 
+            <SubmitButton
               style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }}
               onClick={handleClose}
             >
@@ -250,7 +258,7 @@ export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomS
             </SubmitButton>
 
             <ProgressBar>
-              <ProgressFill 
+              <ProgressFill
                 initial={{ width: '100%' }}
                 animate={{ width: 0 }}
                 transition={{ duration: 5, ease: 'linear' }}

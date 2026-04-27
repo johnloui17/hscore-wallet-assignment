@@ -629,6 +629,7 @@ export default function WalletDetails() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
+      queryClient.invalidateQueries({ queryKey: ['wallets'] }); // refresh home page portfolio
       setSuccessModal({ visible: true, message: `Successfully added ₹${amountInput}` });
       resetForm();
     },
@@ -640,6 +641,7 @@ export default function WalletDetails() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
+      queryClient.invalidateQueries({ queryKey: ['wallets'] }); // refresh home page portfolio
       setSuccessModal({ visible: true, message: `Successfully withdrawn ₹${amountInput}` });
       resetForm();
     },
@@ -668,7 +670,11 @@ export default function WalletDetails() {
     setIsDeleting(true);
     try {
       const result = await deleteWalletAction(walletId);
-      if (result.success) { toast.success('Wallet deleted'); window.location.href = '/'; }
+      if (result.success) { 
+        toast.success('Wallet deleted'); 
+        queryClient.invalidateQueries({ queryKey: ['wallets'] });
+        window.location.href = '/'; 
+      }
       else { toast.error(result.error); setIsDeleting(false); }
     } catch { toast.error('Deletion failed'); setIsDeleting(false); }
   };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import {
@@ -406,12 +406,17 @@ const MobileOnly = styled.div`
 export default function SettingsPage() {
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserId(localStorage.getItem('pocketfeel_user_id'));
+  }, []);
 
   const sections = [
     {
       title: 'Account & Security',
       items: [
-        { icon: <User size={20} />, label: 'Profile Details', sub: 'Ronaldo KK • Platinum member', color: '#3b82f6' },
+        { icon: <User size={20} />, label: 'Profile Details', sub: `${userId || 'User'} • Platinum member`, color: '#3b82f6' },
         { icon: <Shield size={20} />, label: 'Privacy & Permissions', sub: 'Biometric unlock active', color: '#10b981' },
         { icon: <Fingerprint size={20} />, label: 'Face ID & Passcode', sub: 'Manage security keys', color: '#6366f1' },
       ]

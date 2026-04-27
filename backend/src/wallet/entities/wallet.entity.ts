@@ -9,6 +9,9 @@ export class Wallet {
   @Column({ type: 'varchar', default: 'My Vault' })
   name: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  user_id: string;
+
   @Column('numeric', { precision: 15, scale: 2, default: 0 })
   balance: number;
 

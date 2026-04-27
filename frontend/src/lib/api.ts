@@ -1,17 +1,18 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1/wallet';
 
-export async function createWallet(name: string, initialBalance: number = 0) {
+export async function createWallet(name: string, initialBalance: number = 0, userId?: string) {
   const res = await fetch(BASE_URL, { 
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, initialBalance })
+    body: JSON.stringify({ name, initialBalance, userId })
   });
   if (!res.ok) throw new Error('Failed to create wallet');
   return res.json();
 }
 
-export async function getAllWallets() {
-  const res = await fetch(BASE_URL, { next: { tags: ['wallets'] } });
+export async function getAllWallets(userId?: string) {
+  const url = userId ? `${BASE_URL}?userId=${userId}` : BASE_URL;
+  const res = await fetch(url, { next: { tags: ['wallets'] } });
   if (!res.ok) throw new Error('Failed to fetch wallets');
   return res.json();
 }

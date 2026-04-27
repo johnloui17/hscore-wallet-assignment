@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getAllActivity, getAllWallets } from '@/lib/api';
@@ -568,6 +568,12 @@ const MobileOnly = styled.div`
 
 export default function ActivityPage() {
   const router = useRouter();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserId(localStorage.getItem('pocketfeel_user_id'));
+  }, []);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [page, setPage] = useState(0);
@@ -587,16 +593,22 @@ export default function ActivityPage() {
     setSortBy('date'); setSortOrder('DESC'); setPage(0);
   };
 
-  const { data: walletsData, isLoading: isWalletsLoading } = useQuery({ queryKey: ['wallets'], queryFn: getAllWallets });
+  const { data: walletsData, isLoading: isWalletsLoading } = useQuery({ 
+    queryKey: ['wallets', userId], 
+    queryFn: () => getAllWallets(userId || undefined),
+    enabled: userId !== null
+  });
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['all-activity', page, type, category, walletId, startDate, endDate, sortBy, sortOrder],
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['all-activity', userId, page, type, category, walletId, startDate, endDate, sortBy, sortOrder],
     queryFn: () => getAllActivity({
       limit, offset: page * limit, type, category, walletId,
       startDate: startDate ? new Date(startDate).toISOString() : '',
       endDate: endDate ? new Date(endDate).toISOString() : '',
-      sortBy, sortOrder
+      sortBy, sortOrder,
+      userId: userId || undefined
     }),
+    enabled: userId !== null,
     placeholderData: keepPreviousData
   });
 
@@ -607,8 +619,23 @@ export default function ActivityPage() {
   const categories = ['Groceries', 'Bills', 'Dining', 'Entertainment', 'Travel Cost', 'Salary'];
   const activeFilterCount = [type, category, walletId, startDate, endDate, sortBy !== 'date' ? sortBy : '', sortOrder !== 'DESC' ? sortOrder : ''].filter(Boolean).length;
 
-  if (isWalletsLoading || (isLoading && transactions.length === 0)) {
+  if (userId === null || isWalletsLoading || (isLoading && transactions.length === 0)) {
     return <PageLoader />;
+  }
+
+  if (isError) {
+    return (
+      <Page>
+        <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '24px', color: 'white', textAlign: 'center', padding: '24px' }}>
+          <VaultLogo size={64} />
+          <div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Failed to load activity</h2>
+            <p style={{ color: '#94a3b8' }}>Please check your connection and try again.</p>
+          </div>
+          <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 700, cursor: 'pointer' }}>Retry Connection</button>
+        </div>
+      </Page>
+    );
   }
 
   return (
