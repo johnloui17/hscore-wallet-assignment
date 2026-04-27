@@ -1,17 +1,9 @@
-import { getAllWallets } from '@/lib/api';
 import { PortfolioClient } from '@/components/PortfolioClient';
-
-// Ensure the page is always dynamic to show fresh data
-export const dynamic = 'force-dynamic';
+import { cookies } from 'next/headers';
 
 export default async function Home() {
-  // Fetch data on the server
-  let wallets = [];
-  try {
-    wallets = await getAllWallets();
-  } catch (error) {
-    console.error("Failed to fetch wallets:", error);
-  }
+  const cookieStore = await cookies();
+  const userId = cookieStore.get('pocketfeel_user_id')?.value || null;
 
-  return <PortfolioClient wallets={wallets} />;
+  return <PortfolioClient initialUserId={userId} />;
 }

@@ -31,7 +31,6 @@ const SheetContent = styled.div`
   padding: 32px 24px 48px 24px;
   box-shadow: 0 -25px 50px -12px rgba(0, 0, 0, 0.5);
   position: relative;
-  touch-action: none;
 
   @media (min-width: 1024px) {
     border-radius: 40px;
@@ -50,6 +49,7 @@ const HandleBar = styled.div`
   border-radius: 10px;
   margin: 0 auto 24px auto;
   cursor: grab;
+  touch-action: none;
   
   &:active {
     cursor: grabbing;

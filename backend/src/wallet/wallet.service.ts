@@ -14,13 +14,17 @@ export class WalletService {
     private dataSource: DataSource,
   ) {}
 
-  async createWallet(name: string, initialBalance: number = 0): Promise<Wallet> {
+  async createWallet(name: string, initialBalance: number = 0, userId?: string): Promise<Wallet> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const wallet = queryRunner.manager.create(Wallet, { name, balance: initialBalance });
+      const wallet = queryRunner.manager.create(Wallet, { 
+        name, 
+        balance: initialBalance,
+        user_id: userId 
+      });
       await queryRunner.manager.save(wallet);
 
       if (initialBalance > 0) {
@@ -42,8 +46,13 @@ export class WalletService {
     }
   }
 
-  async getAllWallets(): Promise<Wallet[]> {
+  async getAllWallets(userId: string): Promise<Wallet[]> {
+    if (!userId) {
+      throw new BadRequestException('userId query parameter is required');
+    }
+
     return this.walletRepository.find({
+      where: { user_id: userId },
       relations: ['transactions'],
       order: { 
         created_at: 'DESC',
@@ -172,12 +181,19 @@ export class WalletService {
     endDate?: string,
     sortBy: 'date' | 'amount' = 'date',
     sortOrder: 'ASC' | 'DESC' = 'DESC',
-    walletIds?: string[]
+    walletIds?: string[],
+    userId?: string
   ): Promise<{ transactions: Transaction[], total: number }> {
+    if (!userId) {
+      throw new BadRequestException('userId query parameter is required');
+    }
+
     const query = this.transactionRepository.createQueryBuilder('transaction')
       .leftJoinAndSelect('transaction.wallet', 'wallet')
       .take(limit)
       .skip(offset);
+
+    query.andWhere('wallet.user_id = :userId', { userId });
 
     if (walletIds && walletIds.length > 0) {
       query.andWhere('transaction.wallet_id IN (:...walletIds)', { walletIds });

@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { 
-  Home, 
-  Activity, 
-  Plus, 
-  CreditCard, 
-  Settings, 
-  User, 
-  TrendingUp, 
-  ShieldCheck, 
+import { useQuery } from '@tanstack/react-query';
+import { getAllWallets } from '@/lib/api';
+import { PageLoader, VaultLogo } from './PageLoader';
+import {
+  Home,
+  Activity,
+  Plus,
+  CreditCard,
+  Settings,
+  User,
+  TrendingUp,
+  ShieldCheck,
   RefreshCw,
-  LayoutGrid
+  LayoutGrid,
+  Loader2
 } from 'lucide-react';
 import { CreateWalletBottomSheet } from './CreateWalletBottomSheet';
 import { useRouter } from 'next/navigation';
@@ -34,95 +38,56 @@ interface WalletData {
 }
 
 interface PortfolioClientProps {
-  wallets: WalletData[];
-}
-
-/* ── SVG Logo Component ── */
-function VaultLogo({ size = 40 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M32 4L8 16V32C8 47.464 18.536 58.536 32 60C45.464 58.536 56 47.464 56 32V16L32 4Z"
-        stroke="white"
-        strokeWidth="2.5"
-        fill="none"
-      />
-      <circle
-        cx="32"
-        cy="34"
-        r="14"
-        stroke="white"
-        strokeWidth="2"
-        fill="none"
-      />
-      <line x1="32" y1="24" x2="32" y2="44" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="22" y1="34" x2="42" y2="34" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="32" cy="34" r="3" stroke="white" strokeWidth="1.5" fill="none" />
-      <path
-        d="M28 16V13C28 10.791 29.791 9 32 9C34.209 9 36 10.791 36 13V16"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <circle cx="16" cy="22" r="1.5" fill="white" />
-      <circle cx="48" cy="22" r="1.5" fill="white" />
-      <circle cx="16" cy="46" r="1.5" fill="white" />
-      <circle cx="48" cy="46" r="1.5" fill="white" />
-    </svg>
-  );
+  initialUserId: string | null;
 }
 
 /* ── Desktop Sparkline (Dynamic) ── */
 function Sparkline({ transactions, currentBalance, color }: { transactions: TransactionShort[], currentBalance: number, color: string }) {
-  const dataPoints: number[] = [currentBalance];
-  let runningBalance = currentBalance;
+  const pathData = useMemo(() => {
+    const dataPoints: number[] = [currentBalance];
+    let runningBalance = currentBalance;
 
-  const sortedTx = [...(transactions || [])].sort((a, b) => 
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+    const sortedTx = [...(transactions || [])].sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
-  for (const tx of sortedTx) {
-    if (tx.type === 'CREDIT') {
-      runningBalance -= Number(tx.amount);
-    } else {
-      runningBalance += Number(tx.amount);
+    for (const tx of sortedTx) {
+      if (tx.type === 'CREDIT') {
+        runningBalance -= Number(tx.amount);
+      } else {
+        runningBalance += Number(tx.amount);
+      }
+      dataPoints.unshift(runningBalance);
     }
-    dataPoints.unshift(runningBalance);
-  }
 
-  if (dataPoints.length < 2) {
-    dataPoints.unshift(currentBalance);
-  }
+    if (dataPoints.length < 2) {
+      dataPoints.unshift(currentBalance);
+    }
 
-  const min = Math.min(...dataPoints);
-  const max = Math.max(...dataPoints);
-  const range = max - min || 1;
+    const min = Math.min(...dataPoints);
+    const max = Math.max(...dataPoints);
+    const range = max - min || 1;
 
-  const points = dataPoints.map((val, i) => ({
-    x: (i / (dataPoints.length - 1)) * 100,
-    y: 35 - ((val - min) / range) * 30
-  }));
+    const points = dataPoints.map((val, i) => ({
+      x: (i / (dataPoints.length - 1)) * 100,
+      y: 35 - ((val - min) / range) * 30
+    }));
 
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const curr = points[i];
-    const next = points[i + 1];
-    const cp1x = curr.x + (next.x - curr.x) / 2;
-    const cp2x = curr.x + (next.x - curr.x) / 2;
-    d += ` C ${cp1x} ${curr.y}, ${cp2x} ${next.y}, ${next.x} ${next.y}`;
-  }
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const curr = points[i];
+      const next = points[i + 1];
+      const cp1x = curr.x + (next.x - curr.x) / 2;
+      const cp2x = curr.x + (next.x - curr.x) / 2;
+      d += ` C ${cp1x} ${curr.y}, ${cp2x} ${next.y}, ${next.x} ${next.y}`;
+    }
+    return d;
+  }, [transactions, currentBalance]);
 
   return (
     <svg width="100%" height="40" viewBox="0 0 100 40" preserveAspectRatio="none" style={{ filter: 'drop-shadow(0 0 4px ' + color + '40)' }}>
       <motion.path
-        d={d}
+        d={pathData}
         fill="none"
         stroke={color}
         strokeWidth="2.5"
@@ -479,7 +444,7 @@ const WalletList = styled.div`
   }
 `;
 
-const WalletInfoCard = styled(motion.div)<{ $accentColor: string }>`
+const WalletInfoCard = styled(motion.div) <{ $accentColor: string }>`
   background: linear-gradient(145deg,
     rgba(30, 41, 59, 0.85) 0%,
     rgba(15, 23, 42, 0.95) 100%
@@ -690,14 +655,22 @@ const MobileOnly = styled.div`
   }
 `;
 
-export function PortfolioClient({ wallets }: PortfolioClientProps) {
+export function PortfolioClient({ initialUserId }: PortfolioClientProps) {
+  const [userId] = useState<string | null>(initialUserId);
+
+  const { data: wallets = [] as WalletData[], isLoading, isError } = useQuery<WalletData[]>({
+    queryKey: ['wallets', userId],
+    queryFn: () => getAllWallets(userId || undefined),
+    enabled: userId !== null, // Only run query once userId is available
+  });
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const router = useRouter();
   const newestCardRef = useRef<HTMLDivElement>(null);
   const prevWalletsCount = useRef(wallets.length);
 
-  const totalValue = wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0);
+  const totalValue = wallets.reduce((sum: number, w: any) => sum + Number(w.balance || 0), 0);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
@@ -711,11 +684,55 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
       if (isDesktop && newestCardRef.current) {
         setTimeout(() => {
           newestCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
+        }, 100);
       }
     }
     prevWalletsCount.current = wallets.length;
   }, [wallets, isDesktop]);
+
+  if (userId === null || isLoading) {
+    return (
+      <PageLoader />
+    );
+  }
+
+  if (isError) {
+    return (
+      <Page>
+        <div style={{
+          height: '100dvh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '24px',
+          color: 'white',
+          textAlign: 'center',
+          padding: '24px'
+        }}>
+          <VaultLogo size={64} />
+          <div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Failed to load vaults</h2>
+            <p style={{ color: '#94a3b8' }}>Please check your connection and try again.</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '12px 24px',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '16px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </Page>
+    );
+  }
 
   return (
     <Page>
@@ -761,7 +778,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
               <VaultLogo size={36} />
               <BrandName>Pocket Feel</BrandName>
             </LogoTitleRow>
-            
+
             <DesktopOnly>
               <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: 800, marginBottom: '8px' }}>Portfolio Overview</h1>
               <p style={{ color: '#64748b', fontSize: '1.1rem', fontWeight: 500 }}>Global perspective on your assets.</p>
@@ -804,7 +821,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
               </SummaryValue>
               <UserName>
                 <User size={20} />
-                John Doe
+                {userId || 'User'}
               </UserName>
             </SummaryCardContainer>
 
@@ -833,7 +850,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
               </SummaryValue>
               <UserName>
                 <User size={20} />
-                John Doe
+                {userId || 'User'}
               </UserName>
             </SummaryCardContainer>
           </MobileOnly>
@@ -867,10 +884,10 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
                       <CardLabel>Account</CardLabel>
                       <CardName>{wallet.name || 'Unnamed'}</CardName>
                       <DesktopOnly style={{ marginTop: '16px' }}>
-                        <Sparkline 
-                          transactions={wallet.transactions || []} 
-                          currentBalance={Number(wallet.balance)} 
-                          color={getAccentColor(index)} 
+                        <Sparkline
+                          transactions={wallet.transactions || []}
+                          currentBalance={Number(wallet.balance)}
+                          color={getAccentColor(index)}
                         />
                       </DesktopOnly>
                     </div>
@@ -883,11 +900,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
                           maximumFractionDigits: 0,
                         })}
                       </CardBalance>
-                      <CardBottom>
-                        <PlanIndicator $color={getAccentColor(index)}>
-                          {getPlanName()}
-                        </PlanIndicator>
-                      </CardBottom>
+
                     </div>
                   </WalletInfoCard>
                 ))}

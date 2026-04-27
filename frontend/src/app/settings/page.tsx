@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import {
@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   RefreshCw
 } from 'lucide-react';
+import { logoutAction } from '@/app/actions';
 import { motion } from 'framer-motion';
 import { CreateWalletBottomSheet } from '@/components/CreateWalletBottomSheet';
 
@@ -406,12 +407,24 @@ const MobileOnly = styled.div`
 export default function SettingsPage() {
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserId(localStorage.getItem('pocketfeel_user_id'));
+  }, []);
+
+  const handleSignOut = async () => {
+    await logoutAction();
+    localStorage.removeItem('pocketfeel_user_id');
+    router.push('/login');
+    router.refresh();
+  };
 
   const sections = [
     {
       title: 'Account & Security',
       items: [
-        { icon: <User size={20} />, label: 'Profile Details', sub: 'Ronaldo KK • Platinum member', color: '#3b82f6' },
+        { icon: <User size={20} />, label: 'Profile Details', sub: `${userId || 'User'} • Platinum member`, color: '#3b82f6' },
         { icon: <Shield size={20} />, label: 'Privacy & Permissions', sub: 'Biometric unlock active', color: '#10b981' },
         { icon: <Fingerprint size={20} />, label: 'Face ID & Passcode', sub: 'Manage security keys', color: '#6366f1' },
       ]
@@ -489,8 +502,9 @@ export default function SettingsPage() {
             ))}
 
             <SettingItem
-              style={{ marginTop: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.1)' }}
+              style={{ marginTop: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.1)', cursor: 'pointer' }}
               whileTap={{ scale: 0.98 }}
+              onClick={handleSignOut}
             >
               <ItemLeft>
                 <IconBox $color="#ef4444"><LogOut size={20} /></IconBox>

@@ -2,26 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { getBalance, credit, debit, getHistory } from '@/lib/api';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronLeft, 
-  ArrowUpCircle, 
-  ArrowDownCircle, 
-  TrendingUp, 
-  TrendingDown, 
-  ShoppingBag, 
-  FileText, 
-  Utensils, 
-  Film, 
-  Plane, 
-  Briefcase, 
-  Loader2, 
-  Calendar, 
-  History as HistoryIcon, 
-  CheckCircle2, 
+import { PageLoader, VaultLogo } from '@/components/PageLoader';
+import {
+  ChevronLeft,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  TrendingUp,
+  TrendingDown,
+  ShoppingBag,
+  FileText,
+  Utensils,
+  Film,
+  Plane,
+  Briefcase,
+  Loader2,
+  Calendar,
+  History as HistoryIcon,
+  CheckCircle2,
   X,
   AlignLeft,
   Trash2,
@@ -45,22 +46,6 @@ interface TransactionData {
   description?: string;
   created_at: string;
   category?: string;
-}
-
-/* ── Shared SVG Logo ── */
-function VaultLogo({ size = 40 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M32 4L8 16V32C8 47.464 18.536 58.536 32 60C45.464 58.536 56 47.464 56 32V16L32 4Z" stroke="white" strokeWidth="2.5" fill="none" />
-      <circle cx="32" cy="34" r="14" stroke="white" strokeWidth="2" fill="none" />
-      <line x1="32" y1="24" x2="32" y2="44" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="22" y1="34" x2="42" y2="34" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="32" cy="34" r="3" stroke="white" strokeWidth="1.5" fill="none" />
-      <path d="M28 16V13C28 10.791 29.791 9 32 9C34.209 9 36 10.791 36 13V16" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-      <circle cx="16" cy="22" r="1.5" fill="white" /><circle cx="48" cy="22" r="1.5" fill="white" />
-      <circle cx="16" cy="46" r="1.5" fill="white" /><circle cx="48" cy="46" r="1.5" fill="white" />
-    </svg>
-  );
 }
 
 /* ── Styled Components ── */
@@ -159,7 +144,7 @@ const ActionPane = styled.div`
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 48px 20px 24px 20px;
+  padding: 48px 20px 120px 20px;
   
   &::-webkit-scrollbar { display: none; }
   -ms-overflow-style: none;
@@ -354,7 +339,7 @@ const DesktopActionGrid = styled.div`
   }
 `;
 
-const ActionCard = styled(motion.button)<{ $active: boolean; $color: string }>`
+const ActionCard = styled(motion.button) <{ $active: boolean; $color: string }>`
   background: ${props => props.$active ? props.$color + '15' : 'rgba(30, 41, 59, 0.4)'};
   border: 1px solid ${props => props.$active ? props.$color : 'rgba(255, 255, 255, 0.05)'};
   border-radius: 24px;
@@ -379,7 +364,7 @@ const ChoiceGrid = styled.div`
   @media (min-width: 1024px) { display: none; }
 `;
 
-const ChoiceCard = styled(motion.button)<{ $variant?: 'ledger' | 'credit' | 'debit'; $fullWidth?: boolean }>`
+const ChoiceCard = styled(motion.button) <{ $variant?: 'ledger' | 'credit' | 'debit'; $fullWidth?: boolean }>`
   background: rgba(30, 41, 59, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
@@ -397,12 +382,12 @@ const ChoiceCard = styled(motion.button)<{ $variant?: 'ledger' | 'credit' | 'deb
   &:hover {
     background: rgba(30, 41, 59, 0.7);
     border-color: ${({ $variant }) =>
-      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+    $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
   }
 
   svg {
     color: ${({ $variant }) =>
-      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+    $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
     width: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
     height: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
   }
@@ -445,7 +430,7 @@ const DescriptionInput = styled(Input)`
   font-size: 1rem; font-weight: 600; padding: 18px 20px 18px 48px;
 `;
 
-const SubmitButton = styled(motion.button)<{ $type: 'credit' | 'debit' }>`
+const SubmitButton = styled(motion.button) <{ $type: 'credit' | 'debit' }>`
   width: 100%; padding: 20px; border-radius: 20px; font-weight: 700; font-size: 1.1rem;
   display: flex; justify-content: center; align-items: center; gap: 10px;
   cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 1px;
@@ -463,7 +448,7 @@ const CategoryLabel = styled.p`
   text-align: center; text-transform: uppercase; letter-spacing: 1px;
 `;
 
-const IconBtn = styled(motion.button)<{ $active: boolean }>`
+const IconBtn = styled(motion.button) <{ $active: boolean }>`
   background: ${({ $active }) => ($active ? 'rgba(59, 130, 246, 0.2)' : 'rgba(30, 41, 59, 0.5)')};
   border: 1px solid ${({ $active }) => ($active ? '#3b82f6' : 'rgba(255, 255, 255, 0.05)')};
   color: ${({ $active }) => ($active ? '#3b82f6' : '#64748b')};
@@ -553,7 +538,6 @@ const Pagination = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto; /* Push to bottom of LedgerPane */
   padding-top: 24px;
 `;
 const PageBtn = styled.button`
@@ -604,8 +588,17 @@ export default function WalletDetails() {
     { icon: <Plane size={20} />, name: 'Travel Cost' }, { icon: <Briefcase size={20} />, name: 'Salary' },
   ];
 
-  const { data: balanceData } = useQuery({ queryKey: ['balance', walletId], queryFn: () => getBalance(walletId), refetchInterval: 5000 });
-  const { data: historyData } = useQuery({ queryKey: ['history', walletId, page], queryFn: () => getHistory(walletId, limit, page * limit) });
+  const { data: balanceData, isLoading: isBalanceLoading } = useQuery({ 
+    queryKey: ['balance', walletId], 
+    queryFn: () => getBalance(walletId),
+    enabled: !!walletId 
+  });
+  const { data: historyData, isLoading: isHistoryLoading } = useQuery({ 
+    queryKey: ['history', walletId, page], 
+    queryFn: () => getHistory(walletId, limit, page * limit),
+    placeholderData: keepPreviousData,
+    enabled: !!walletId
+  });
 
   useEffect(() => {
     if (successModal.visible) {
@@ -640,6 +633,8 @@ export default function WalletDetails() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
+      queryClient.invalidateQueries({ queryKey: ['wallets'] }); // refresh home page portfolio
+      queryClient.invalidateQueries({ queryKey: ['all-activity'] }); // Update activity feed
       setSuccessModal({ visible: true, message: `Successfully added ₹${amountInput}` });
       resetForm();
     },
@@ -651,6 +646,8 @@ export default function WalletDetails() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
+      queryClient.invalidateQueries({ queryKey: ['wallets'] }); // refresh home page portfolio
+      queryClient.invalidateQueries({ queryKey: ['all-activity'] }); // Update activity feed
       setSuccessModal({ visible: true, message: `Successfully withdrawn ₹${amountInput}` });
       resetForm();
     },
@@ -679,7 +676,12 @@ export default function WalletDetails() {
     setIsDeleting(true);
     try {
       const result = await deleteWalletAction(walletId);
-      if (result.success) { toast.success('Wallet deleted'); window.location.href = '/'; }
+      if (result.success) { 
+        toast.success('Wallet deleted'); 
+        queryClient.invalidateQueries({ queryKey: ['wallets'] });
+        queryClient.invalidateQueries({ queryKey: ['all-activity'] }); // Update activity feed
+        window.location.href = '/'; 
+      }
       else { toast.error(result.error); setIsDeleting(false); }
     } catch { toast.error('Deletion failed'); setIsDeleting(false); }
   };
@@ -689,10 +691,27 @@ export default function WalletDetails() {
     else setViewMode('choice');
   };
 
+  // Scroll to bottom when page changes or history is opened
+  useEffect(() => {
+    if (viewMode === 'history' || isDesktop) {
+      // Small timeout to allow content to render
+      setTimeout(() => {
+        const containers = document.querySelectorAll('[data-scroll-container="true"]');
+        containers.forEach(container => {
+          container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        });
+      }, 100);
+    }
+  }, [page, viewMode, isDesktop]);
+
   const currentBalance = balanceData?.balance || 0;
   const transactions = (historyData?.transactions as TransactionData[]) || [];
   const totalPages = Math.ceil((historyData?.total || 0) / limit);
   const isPending = creditMutation.isPending || debitMutation.isPending;
+
+  if (isBalanceLoading || isHistoryLoading) {
+    return <PageLoader />;
+  }
 
   return (
     <Page>
@@ -713,7 +732,7 @@ export default function WalletDetails() {
 
       <MainContent>
         <WorkspaceGrid>
-          <ActionPane>
+          <ActionPane data-scroll-container="true">
             <HeaderSection>
               <HeaderRow>
                 <BackBtn whileHover={{ x: -4 }} onClick={handleBack}><ChevronLeft size={18} />{isDesktop ? 'Dashboard' : (viewMode === 'choice' ? 'Dashboard' : 'Options')}</BackBtn>
@@ -780,41 +799,52 @@ export default function WalletDetails() {
                 )}
 
                 {viewMode === 'history' && (
-                  <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: '40px' }}>
                     <HistoryHeader><HistoryTitle>Ledger</HistoryTitle></HistoryHeader>
                     <LedgerBox>
-                      {transactions.map((tx) => (
-                        <TransactionRow key={tx.id}>
-                          <TransLeft>
-                            <TransIcon $type={tx.type}>{tx.type === 'CREDIT' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}</TransIcon>
-                            <div><TransTitle>{tx.type === 'CREDIT' ? 'Funds Received' : 'Funds Withdrawn'}</TransTitle>{tx.description && <TransDesc>{tx.description}</TransDesc>}<TransSub><Calendar size={12} />{new Date(tx.created_at).toLocaleDateString()}</TransSub></div>
-                          </TransLeft>
-                          <TransAmount $type={tx.type}>{tx.type === 'CREDIT' ? '+' : '-'}{Number(tx.amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}</TransAmount>
-                        </TransactionRow>
-                      ))}
+                      {transactions.length === 0 ? (
+                        <p style={{ color: '#94a3b8', textAlign: 'center', margin: '40px 0' }}>No transactions recorded yet.</p>
+                      ) : (
+                        transactions.map((tx) => (
+                          <TransactionRow key={tx.id}>
+                            <TransLeft>
+                              <TransIcon $type={tx.type}>{tx.type === 'CREDIT' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}</TransIcon>
+                              <div><TransTitle>{tx.type === 'CREDIT' ? 'Funds Received' : 'Funds Withdrawn'}</TransTitle>{tx.description && <TransDesc>{tx.description}</TransDesc>}<TransSub><Calendar size={12} />{new Date(tx.created_at).toLocaleDateString()}</TransSub></div>
+                            </TransLeft>
+                            <TransAmount $type={tx.type}>{tx.type === 'CREDIT' ? '+' : '-'}{Number(tx.amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}</TransAmount>
+                          </TransactionRow>
+                        ))
+                      )}
                     </LedgerBox>
+                    <Pagination>
+                      <PageBtn disabled={page === 0} onClick={() => setPage((p) => p - 1)}>Previous</PageBtn>
+                      <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600 }}>{page + 1} / {totalPages || 1}</span>
+                      <PageBtn disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>Next</PageBtn>
+                    </Pagination>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <DeleteSection>
-                {!confirmDelete ? (
-                  <DeleteBtn onClick={() => setConfirmDelete(true)} whileTap={{ scale: 0.95 }}><Trash2 size={18} />Delete Wallet</DeleteBtn>
-                ) : (
-                  <ConfirmDeleteBox initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                    <AlertCircle size={32} color="#ef4444" />
-                    <div><h4 style={{ color: 'white', margin: '0 0 4px 0' }}>Are you sure?</h4><p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>This action cannot be undone.</p></div>
-                    <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
-                      <SubmitButton $type="credit" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }} onClick={() => setConfirmDelete(false)}>Cancel</SubmitButton>
-                      <SubmitButton $type="debit" onClick={handleDelete} disabled={isDeleting}>{isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete'}</SubmitButton>
-                    </div>
-                  </ConfirmDeleteBox>
-                )}
-              </DeleteSection>
+              {viewMode !== 'history' && (
+                <DeleteSection>
+                  {!confirmDelete ? (
+                    <DeleteBtn onClick={() => setConfirmDelete(true)} whileTap={{ scale: 0.95 }}><Trash2 size={18} />Delete Wallet</DeleteBtn>
+                  ) : (
+                    <ConfirmDeleteBox initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                      <AlertCircle size={32} color="#ef4444" />
+                      <div><h4 style={{ color: 'white', margin: '0 0 4px 0' }}>Are you sure?</h4><p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>This action cannot be undone.</p></div>
+                      <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
+                        <SubmitButton $type="credit" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }} onClick={() => setConfirmDelete(false)}>Cancel</SubmitButton>
+                        <SubmitButton $type="debit" onClick={handleDelete} disabled={isDeleting}>{isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete'}</SubmitButton>
+                      </div>
+                    </ConfirmDeleteBox>
+                  )}
+                </DeleteSection>
+              )}
             </ActionHub>
           </ActionPane>
 
-          <LedgerPane>
+          <LedgerPane data-scroll-container="true">
             <HistoryHeader><HistoryTitle>Live Ledger</HistoryTitle></HistoryHeader>
             <LedgerBox>
               {transactions.length === 0 ? (

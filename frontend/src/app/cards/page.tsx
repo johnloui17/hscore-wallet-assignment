@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -451,6 +451,11 @@ const MobileOnly = styled.div`
 export default function CardsPage() {
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserId(localStorage.getItem('pocketfeel_user_id'));
+  }, []);
 
   return (
     <Page>
@@ -514,7 +519,7 @@ export default function CardsPage() {
               <CardBottom>
                 <HolderInfo>
                   <Label>Valued Member</Label>
-                  <HolderName>Ronaldo KK</HolderName>
+                  <HolderName>{userId || 'User'}</HolderName>
                 </HolderInfo>
                 <PremiumBadge>PRIME</PremiumBadge>
               </CardBottom>

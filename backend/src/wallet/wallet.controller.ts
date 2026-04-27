@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, Body, Query, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Query, Delete, BadRequestException } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { TransactDto } from './dto/wallet.dto';
 import { CreateWalletDto } from './dto/create-wallet.dto';
@@ -9,12 +9,12 @@ export class WalletController {
 
   @Post()
   async create(@Body() createDto: CreateWalletDto) {
-    return this.walletService.createWallet(createDto.name, createDto.initialBalance);
+    return this.walletService.createWallet(createDto.name, createDto.initialBalance, createDto.userId);
   }
 
   @Get()
-  async getAll() {
-    return this.walletService.getAllWallets();
+  async getAll(@Query('userId') userId: string) {
+    return this.walletService.getAllWallets(userId);
   }
 
   @Delete(':id')
@@ -48,6 +48,7 @@ export class WalletController {
 
   @Get('transactions/all')
   async getAllTransactions(
+    @Query('userId') userId: string,
     @Query('limit') limit = 10,
     @Query('offset') offset = 0,
     @Query('type') type?: string,
@@ -58,6 +59,9 @@ export class WalletController {
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'DESC',
     @Query('walletId') walletId?: string | string[],
   ) {
+    if (!userId) {
+      throw new BadRequestException('userId query parameter is required');
+    }
     const walletIds = Array.isArray(walletId) 
       ? walletId 
       : walletId ? walletId.split(',') : undefined;
@@ -72,6 +76,7 @@ export class WalletController {
       sortBy,
       sortOrder,
       walletIds,
+      userId,
     );
   }
 }
