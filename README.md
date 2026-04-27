@@ -25,36 +25,52 @@ Pocket Feel is a premium, full-stack digital wallet application designed for sec
 
 ## 📸 Full Product Showcase
 
-### 🖥️ Desktop Experience
-*High-fidelity workspace designed for professional asset management.*
-
-#### **1. Authentication & Onboarding**
-| Login Page | Home (Empty) | Create Wallet |
-| :---: | :---: | :---: |
-| ![Login](./assets/desktopLoginPage.png) | ![Home Empty](./assets/desktopHomePage.png) | ![Create](./assets/desktopCreateWallet.png) |
-
-#### **2. Portfolio & Transaction Management**
-| Dashboard (Filled) | Wallet Detail | Delete Confirmation |
-| :---: | :---: | :---: |
-| ![Home Fill](./assets/desktopHomePageFill.png) | ![Wallet](./assets/desktopWalletPage.png) | ![Delete](./assets/DesktopDeleteWallet.png) |
-
-#### **3. Activity & Configuration**
-| Global Activity | Cards Overview | Settings Hub |
-| :---: | :---: | :---: |
-| ![Activity](./assets/desktopActivityPage.png) | ![Cards](./assets/desktopCardsPage.png) | ![Settings](./assets/desktopSettingsPage.png) |
-
----
-
 ### 📱 Mobile Experience
 *Thumb-friendly navigation with native-feeling interactions.*
 
-| Login | Home Screen | Wallet Cards |
+| Login Screen | Home & Portfolio | Wallet Management |
 | :---: | :---: | :---: |
 | ![Mobile Login](./assets/mobileLoginPage.png) | ![Mobile Home](./assets/mobileHomePage.png) | ![Mobile Cards](./assets/mobileCardsPage.png) |
-
-| Activity Log | Swipe to Delete | Settings |
-| :---: | :---: | :---: |
+| **Activity Log** | **Safe Deletion** | **User Settings** |
 | ![Mobile Activity](./assets/mobileActivityPage.png) | ![Mobile Delete](./assets/mobileDeleteWallet.png) | ![Mobile Settings](./assets/mobileSettingsPage.png) |
+| **Settings (Cont.)** | | |
+| ![Mobile Settings 2](./assets/mobileSettingsPageContinued.png) | | |
+
+---
+
+### 🖥️ Desktop Experience
+*High-fidelity workspace designed for professional asset management.*
+
+#### **1. Authentication & Portfolio**
+**Login & Secure Entry**
+![Login](./assets/desktopLoginPage.png)
+
+**Empty State Dashboard**
+![Home Empty](./assets/desktopHomePage.png)
+
+#### **2. Wallet Management**
+**High-Fidelity Create Flow**
+![Create](./assets/desktopCreateWallet.png)
+
+**Active Portfolio Dashboard**
+![Home Fill](./assets/desktopHomePageFill.png)
+
+#### **3. Transaction Workspace**
+**Real-Time Wallet Detail**
+![Wallet](./assets/desktopWalletPage.png)
+
+**Safe Swipe-to-Delete Confirmation**
+![Delete](./assets/DesktopDeleteWallet.png)
+
+#### **4. Global Audit & Setup**
+**Global Activity Ledger**
+![Activity](./assets/desktopActivityPage.png)
+
+**Cards & Virtual Identity**
+![Cards](./assets/desktopCardsPage.png)
+
+**Settings & Session Management**
+![Settings](./assets/desktopSettingsPage.png)
 
 ---
 
