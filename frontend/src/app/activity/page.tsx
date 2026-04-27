@@ -599,7 +599,7 @@ export default function ActivityPage() {
     enabled: userId !== null
   });
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['all-activity', userId, page, type, category, walletId, startDate, endDate, sortBy, sortOrder],
     queryFn: () => getAllActivity({
       limit, offset: page * limit, type, category, walletId,
@@ -632,7 +632,7 @@ export default function ActivityPage() {
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Failed to load activity</h2>
             <p style={{ color: '#94a3b8' }}>Please check your connection and try again.</p>
           </div>
-          <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 700, cursor: 'pointer' }}>Retry Connection</button>
+          <button onClick={() => refetch()} style={{ padding: '12px 24px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 700, cursor: 'pointer' }}>Retry Connection</button>
         </div>
       </Page>
     );

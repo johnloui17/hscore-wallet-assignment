@@ -38,7 +38,7 @@ interface WalletData {
 }
 
 interface PortfolioClientProps {
-  // wallets prop removed as it's now handled by useQuery
+  initialUserId: string | null;
 }
 
 /* ── Desktop Sparkline (Dynamic) ── */
@@ -655,14 +655,8 @@ const MobileOnly = styled.div`
   }
 `;
 
-export function PortfolioClient() {
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Access localStorage on the client side
-    const storedUserId = localStorage.getItem('pocketfeel_user_id');
-    setUserId(storedUserId);
-  }, []);
+export function PortfolioClient({ initialUserId }: PortfolioClientProps) {
+  const [userId] = useState<string | null>(initialUserId);
 
   const { data: wallets = [] as WalletData[], isLoading, isError } = useQuery<WalletData[]>({
     queryKey: ['wallets', userId],

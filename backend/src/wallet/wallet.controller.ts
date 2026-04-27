@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, Body, Query, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Query, Delete, BadRequestException } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { TransactDto } from './dto/wallet.dto';
 import { CreateWalletDto } from './dto/create-wallet.dto';
@@ -13,7 +13,7 @@ export class WalletController {
   }
 
   @Get()
-  async getAll(@Query('userId') userId?: string) {
+  async getAll(@Query('userId') userId: string) {
     return this.walletService.getAllWallets(userId);
   }
 
@@ -57,8 +57,11 @@ export class WalletController {
     @Query('sortBy') sortBy: 'date' | 'amount' = 'date',
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'DESC',
     @Query('walletId') walletId?: string | string[],
-    @Query('userId') userId?: string,
+    @Query('userId') userId: string,
   ) {
+    if (!userId) {
+      throw new BadRequestException('userId query parameter is required');
+    }
     const walletIds = Array.isArray(walletId) 
       ? walletId 
       : walletId ? walletId.split(',') : undefined;

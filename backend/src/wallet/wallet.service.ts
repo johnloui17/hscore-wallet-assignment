@@ -46,14 +46,13 @@ export class WalletService {
     }
   }
 
-  async getAllWallets(userId?: string): Promise<Wallet[]> {
-    const where: any = {};
-    if (userId) {
-      where.user_id = userId;
+  async getAllWallets(userId: string): Promise<Wallet[]> {
+    if (!userId) {
+      throw new BadRequestException('userId query parameter is required');
     }
 
     return this.walletRepository.find({
-      where,
+      where: { user_id: userId },
       relations: ['transactions'],
       order: { 
         created_at: 'DESC',
@@ -185,14 +184,16 @@ export class WalletService {
     walletIds?: string[],
     userId?: string
   ): Promise<{ transactions: Transaction[], total: number }> {
+    if (!userId) {
+      throw new BadRequestException('userId query parameter is required');
+    }
+
     const query = this.transactionRepository.createQueryBuilder('transaction')
       .leftJoinAndSelect('transaction.wallet', 'wallet')
       .take(limit)
       .skip(offset);
 
-    if (userId) {
-      query.andWhere('wallet.user_id = :userId', { userId });
-    }
+    query.andWhere('wallet.user_id = :userId', { userId });
 
     if (walletIds && walletIds.length > 0) {
       query.andWhere('transaction.wallet_id IN (:...walletIds)', { walletIds });

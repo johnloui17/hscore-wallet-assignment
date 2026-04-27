@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { loginAction } from '@/app/actions';
 
 const Page = styled.div`
   min-height: 100dvh;
@@ -156,20 +157,24 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId.trim()) return;
+    const cleanUserId = userId.trim();
+    if (!cleanUserId) return;
 
     setIsLoading(true);
 
-    // Save to localStorage
-    localStorage.setItem('pocketfeel_user_id', userId.trim());
+    try {
+      // Save to cookie via Server Action (secure httpOnly)
+      await loginAction(cleanUserId);
 
-    // Save to cookie (for middleware)
-    document.cookie = `pocketfeel_user_id=${userId.trim()}; path=/; max-age=31536000; SameSite=Lax`;
+      // Save to localStorage for minor client-side persistence/UX
+      localStorage.setItem('pocketfeel_user_id', cleanUserId);
 
-    // Small delay for UX
-    setTimeout(() => {
       router.push('/');
-    }, 800);
+      router.refresh();
+    } catch (error) {
+      console.error('Login failed:', error);
+      setIsLoading(false);
+    }
   };
 
   return (

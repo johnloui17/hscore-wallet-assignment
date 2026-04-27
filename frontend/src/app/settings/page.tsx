@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   RefreshCw
 } from 'lucide-react';
+import { logoutAction } from '@/app/actions';
 import { motion } from 'framer-motion';
 import { CreateWalletBottomSheet } from '@/components/CreateWalletBottomSheet';
 
@@ -412,10 +413,11 @@ export default function SettingsPage() {
     setUserId(localStorage.getItem('pocketfeel_user_id'));
   }, []);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await logoutAction();
     localStorage.removeItem('pocketfeel_user_id');
-    document.cookie = 'pocketfeel_user_id=; path=/; max-age=0; SameSite=Lax';
     router.push('/login');
+    router.refresh();
   };
 
   const sections = [

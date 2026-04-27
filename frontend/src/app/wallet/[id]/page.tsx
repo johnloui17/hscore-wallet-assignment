@@ -588,11 +588,16 @@ export default function WalletDetails() {
     { icon: <Plane size={20} />, name: 'Travel Cost' }, { icon: <Briefcase size={20} />, name: 'Salary' },
   ];
 
-  const { data: balanceData, isLoading: isBalanceLoading } = useQuery({ queryKey: ['balance', walletId], queryFn: () => getBalance(walletId) });
+  const { data: balanceData, isLoading: isBalanceLoading } = useQuery({ 
+    queryKey: ['balance', walletId], 
+    queryFn: () => getBalance(walletId),
+    enabled: !!walletId 
+  });
   const { data: historyData, isLoading: isHistoryLoading } = useQuery({ 
     queryKey: ['history', walletId, page], 
     queryFn: () => getHistory(walletId, limit, page * limit),
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
+    enabled: !!walletId
   });
 
   useEffect(() => {

@@ -11,8 +11,8 @@ export async function createWallet(name: string, initialBalance: number = 0, use
 }
 
 export async function getAllWallets(userId?: string) {
-  const url = userId ? `${BASE_URL}?userId=${userId}` : BASE_URL;
-  const res = await fetch(url, { next: { tags: ['wallets'] } });
+  const query = userId ? `?userId=${userId}` : '';
+  const res = await fetch(`${BASE_URL}${query}`, { next: { tags: ['wallets'] } });
   if (!res.ok) throw new Error('Failed to fetch wallets');
   return res.json();
 }
