@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getAllActivity, getAllWallets } from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PageLoader, VaultLogo } from '@/components/PageLoader';
 import { 
   TrendingUp, 
   TrendingDown,
@@ -39,39 +40,6 @@ interface TransactionData {
   wallet?: {
     name: string;
   };
-}
-
-/* ── SVG Logo Component (Shared) ── */
-function VaultLogo({ size = 40 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M32 4L8 16V32C8 47.464 18.536 58.536 32 60C45.464 58.536 56 47.464 56 32V16L32 4Z"
-        stroke="white"
-        strokeWidth="2.5"
-        fill="none"
-      />
-      <circle cx="32" cy="34" r="14" stroke="white" strokeWidth="2" fill="none" />
-      <line x1="32" y1="24" x2="32" y2="44" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="22" y1="34" x2="42" y2="34" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="32" cy="34" r="3" stroke="white" strokeWidth="1.5" fill="none" />
-      <path
-        d="M28 16V13C28 10.791 29.791 9 32 9C34.209 9 36 10.791 36 13V16"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <circle cx="16" cy="22" r="1.5" fill="white" /><circle cx="48" cy="22" r="1.5" fill="white" />
-      <circle cx="16" cy="46" r="1.5" fill="white" /><circle cx="48" cy="46" r="1.5" fill="white" />
-    </svg>
-  );
 }
 
 /* ── Styled Components ── */
@@ -619,7 +587,7 @@ export default function ActivityPage() {
     setSortBy('date'); setSortOrder('DESC'); setPage(0);
   };
 
-  const { data: walletsData } = useQuery({ queryKey: ['wallets'], queryFn: getAllWallets });
+  const { data: walletsData, isLoading: isWalletsLoading } = useQuery({ queryKey: ['wallets'], queryFn: getAllWallets });
 
   const { data, isLoading } = useQuery({
     queryKey: ['all-activity', page, type, category, walletId, startDate, endDate, sortBy, sortOrder],
@@ -629,6 +597,7 @@ export default function ActivityPage() {
       endDate: endDate ? new Date(endDate).toISOString() : '',
       sortBy, sortOrder
     }),
+    placeholderData: keepPreviousData
   });
 
   const transactions = (data?.transactions as TransactionData[]) || [];
@@ -637,6 +606,10 @@ export default function ActivityPage() {
 
   const categories = ['Groceries', 'Bills', 'Dining', 'Entertainment', 'Travel Cost', 'Salary'];
   const activeFilterCount = [type, category, walletId, startDate, endDate, sortBy !== 'date' ? sortBy : '', sortOrder !== 'DESC' ? sortOrder : ''].filter(Boolean).length;
+
+  if (isWalletsLoading || (isLoading && transactions.length === 0)) {
+    return <PageLoader />;
+  }
 
   return (
     <Page>
@@ -678,9 +651,7 @@ export default function ActivityPage() {
         </FixedHeader>
 
         <ScrollArea>
-          {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '80px' }}><Loader2 className="animate-spin" color="#3b82f6" size={32} /></div>
-          ) : transactions.length === 0 ? (
+          {transactions.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 20px', color: '#64748b' }}><p style={{ fontWeight: 600 }}>No activities found.</p></div>
           ) : (
             <LedgerBox>

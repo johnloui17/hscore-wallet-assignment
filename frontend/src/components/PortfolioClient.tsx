@@ -3,17 +3,21 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { 
-  Home, 
-  Activity, 
-  Plus, 
-  CreditCard, 
-  Settings, 
-  User, 
-  TrendingUp, 
-  ShieldCheck, 
+import { useQuery } from '@tanstack/react-query';
+import { getAllWallets } from '@/lib/api';
+import { PageLoader, VaultLogo } from './PageLoader';
+import {
+  Home,
+  Activity,
+  Plus,
+  CreditCard,
+  Settings,
+  User,
+  TrendingUp,
+  ShieldCheck,
   RefreshCw,
-  LayoutGrid
+  LayoutGrid,
+  Loader2
 } from 'lucide-react';
 import { CreateWalletBottomSheet } from './CreateWalletBottomSheet';
 import { useRouter } from 'next/navigation';
@@ -34,49 +38,7 @@ interface WalletData {
 }
 
 interface PortfolioClientProps {
-  wallets: WalletData[];
-}
-
-/* ── SVG Logo Component ── */
-function VaultLogo({ size = 40 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M32 4L8 16V32C8 47.464 18.536 58.536 32 60C45.464 58.536 56 47.464 56 32V16L32 4Z"
-        stroke="white"
-        strokeWidth="2.5"
-        fill="none"
-      />
-      <circle
-        cx="32"
-        cy="34"
-        r="14"
-        stroke="white"
-        strokeWidth="2"
-        fill="none"
-      />
-      <line x1="32" y1="24" x2="32" y2="44" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="22" y1="34" x2="42" y2="34" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="32" cy="34" r="3" stroke="white" strokeWidth="1.5" fill="none" />
-      <path
-        d="M28 16V13C28 10.791 29.791 9 32 9C34.209 9 36 10.791 36 13V16"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <circle cx="16" cy="22" r="1.5" fill="white" />
-      <circle cx="48" cy="22" r="1.5" fill="white" />
-      <circle cx="16" cy="46" r="1.5" fill="white" />
-      <circle cx="48" cy="46" r="1.5" fill="white" />
-    </svg>
-  );
+  // wallets prop removed as it's now handled by useQuery
 }
 
 /* ── Desktop Sparkline (Dynamic) ── */
@@ -84,7 +46,7 @@ function Sparkline({ transactions, currentBalance, color }: { transactions: Tran
   const dataPoints: number[] = [currentBalance];
   let runningBalance = currentBalance;
 
-  const sortedTx = [...(transactions || [])].sort((a, b) => 
+  const sortedTx = [...(transactions || [])].sort((a, b) =>
     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
@@ -479,7 +441,7 @@ const WalletList = styled.div`
   }
 `;
 
-const WalletInfoCard = styled(motion.div)<{ $accentColor: string }>`
+const WalletInfoCard = styled(motion.div) <{ $accentColor: string }>`
   background: linear-gradient(145deg,
     rgba(30, 41, 59, 0.85) 0%,
     rgba(15, 23, 42, 0.95) 100%
@@ -690,7 +652,12 @@ const MobileOnly = styled.div`
   }
 `;
 
-export function PortfolioClient({ wallets }: PortfolioClientProps) {
+export function PortfolioClient() {
+  const { data: wallets = [], isLoading, isError } = useQuery({
+    queryKey: ['wallets'],
+    queryFn: getAllWallets,
+  });
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const router = useRouter();
@@ -716,6 +683,18 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
     }
     prevWalletsCount.current = wallets.length;
   }, [wallets, isDesktop]);
+
+  if (isLoading) {
+    return (
+      <PageLoader />
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageLoader />
+    );
+  }
 
   return (
     <Page>
@@ -761,7 +740,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
               <VaultLogo size={36} />
               <BrandName>Pocket Feel</BrandName>
             </LogoTitleRow>
-            
+
             <DesktopOnly>
               <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: 800, marginBottom: '8px' }}>Portfolio Overview</h1>
               <p style={{ color: '#64748b', fontSize: '1.1rem', fontWeight: 500 }}>Global perspective on your assets.</p>
@@ -804,7 +783,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
               </SummaryValue>
               <UserName>
                 <User size={20} />
-                John Doe
+                Ronaldo KK
               </UserName>
             </SummaryCardContainer>
 
@@ -833,7 +812,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
               </SummaryValue>
               <UserName>
                 <User size={20} />
-                John Doe
+                Ronaldo KK
               </UserName>
             </SummaryCardContainer>
           </MobileOnly>
@@ -867,10 +846,10 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
                       <CardLabel>Account</CardLabel>
                       <CardName>{wallet.name || 'Unnamed'}</CardName>
                       <DesktopOnly style={{ marginTop: '16px' }}>
-                        <Sparkline 
-                          transactions={wallet.transactions || []} 
-                          currentBalance={Number(wallet.balance)} 
-                          color={getAccentColor(index)} 
+                        <Sparkline
+                          transactions={wallet.transactions || []}
+                          currentBalance={Number(wallet.balance)}
+                          color={getAccentColor(index)}
                         />
                       </DesktopOnly>
                     </div>

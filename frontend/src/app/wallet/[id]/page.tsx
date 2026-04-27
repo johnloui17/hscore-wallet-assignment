@@ -2,26 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { getBalance, credit, debit, getHistory } from '@/lib/api';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronLeft, 
-  ArrowUpCircle, 
-  ArrowDownCircle, 
-  TrendingUp, 
-  TrendingDown, 
-  ShoppingBag, 
-  FileText, 
-  Utensils, 
-  Film, 
-  Plane, 
-  Briefcase, 
-  Loader2, 
-  Calendar, 
-  History as HistoryIcon, 
-  CheckCircle2, 
+import { PageLoader, VaultLogo } from '@/components/PageLoader';
+import {
+  ChevronLeft,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  TrendingUp,
+  TrendingDown,
+  ShoppingBag,
+  FileText,
+  Utensils,
+  Film,
+  Plane,
+  Briefcase,
+  Loader2,
+  Calendar,
+  History as HistoryIcon,
+  CheckCircle2,
   X,
   AlignLeft,
   Trash2,
@@ -45,22 +46,6 @@ interface TransactionData {
   description?: string;
   created_at: string;
   category?: string;
-}
-
-/* ── Shared SVG Logo ── */
-function VaultLogo({ size = 40 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M32 4L8 16V32C8 47.464 18.536 58.536 32 60C45.464 58.536 56 47.464 56 32V16L32 4Z" stroke="white" strokeWidth="2.5" fill="none" />
-      <circle cx="32" cy="34" r="14" stroke="white" strokeWidth="2" fill="none" />
-      <line x1="32" y1="24" x2="32" y2="44" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="22" y1="34" x2="42" y2="34" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="32" cy="34" r="3" stroke="white" strokeWidth="1.5" fill="none" />
-      <path d="M28 16V13C28 10.791 29.791 9 32 9C34.209 9 36 10.791 36 13V16" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-      <circle cx="16" cy="22" r="1.5" fill="white" /><circle cx="48" cy="22" r="1.5" fill="white" />
-      <circle cx="16" cy="46" r="1.5" fill="white" /><circle cx="48" cy="46" r="1.5" fill="white" />
-    </svg>
-  );
 }
 
 /* ── Styled Components ── */
@@ -354,7 +339,7 @@ const DesktopActionGrid = styled.div`
   }
 `;
 
-const ActionCard = styled(motion.button)<{ $active: boolean; $color: string }>`
+const ActionCard = styled(motion.button) <{ $active: boolean; $color: string }>`
   background: ${props => props.$active ? props.$color + '15' : 'rgba(30, 41, 59, 0.4)'};
   border: 1px solid ${props => props.$active ? props.$color : 'rgba(255, 255, 255, 0.05)'};
   border-radius: 24px;
@@ -379,7 +364,7 @@ const ChoiceGrid = styled.div`
   @media (min-width: 1024px) { display: none; }
 `;
 
-const ChoiceCard = styled(motion.button)<{ $variant?: 'ledger' | 'credit' | 'debit'; $fullWidth?: boolean }>`
+const ChoiceCard = styled(motion.button) <{ $variant?: 'ledger' | 'credit' | 'debit'; $fullWidth?: boolean }>`
   background: rgba(30, 41, 59, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
@@ -397,12 +382,12 @@ const ChoiceCard = styled(motion.button)<{ $variant?: 'ledger' | 'credit' | 'deb
   &:hover {
     background: rgba(30, 41, 59, 0.7);
     border-color: ${({ $variant }) =>
-      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+    $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
   }
 
   svg {
     color: ${({ $variant }) =>
-      $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
+    $variant === 'credit' ? '#10b981' : $variant === 'debit' ? '#ef4444' : '#3b82f6'};
     width: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
     height: ${({ $fullWidth }) => ($fullWidth ? '24px' : '32px')};
   }
@@ -445,7 +430,7 @@ const DescriptionInput = styled(Input)`
   font-size: 1rem; font-weight: 600; padding: 18px 20px 18px 48px;
 `;
 
-const SubmitButton = styled(motion.button)<{ $type: 'credit' | 'debit' }>`
+const SubmitButton = styled(motion.button) <{ $type: 'credit' | 'debit' }>`
   width: 100%; padding: 20px; border-radius: 20px; font-weight: 700; font-size: 1.1rem;
   display: flex; justify-content: center; align-items: center; gap: 10px;
   cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 1px;
@@ -463,7 +448,7 @@ const CategoryLabel = styled.p`
   text-align: center; text-transform: uppercase; letter-spacing: 1px;
 `;
 
-const IconBtn = styled(motion.button)<{ $active: boolean }>`
+const IconBtn = styled(motion.button) <{ $active: boolean }>`
   background: ${({ $active }) => ($active ? 'rgba(59, 130, 246, 0.2)' : 'rgba(30, 41, 59, 0.5)')};
   border: 1px solid ${({ $active }) => ($active ? '#3b82f6' : 'rgba(255, 255, 255, 0.05)')};
   color: ${({ $active }) => ($active ? '#3b82f6' : '#64748b')};
@@ -604,8 +589,12 @@ export default function WalletDetails() {
     { icon: <Plane size={20} />, name: 'Travel Cost' }, { icon: <Briefcase size={20} />, name: 'Salary' },
   ];
 
-  const { data: balanceData } = useQuery({ queryKey: ['balance', walletId], queryFn: () => getBalance(walletId), refetchInterval: 5000 });
-  const { data: historyData } = useQuery({ queryKey: ['history', walletId, page], queryFn: () => getHistory(walletId, limit, page * limit) });
+  const { data: balanceData, isLoading: isBalanceLoading } = useQuery({ queryKey: ['balance', walletId], queryFn: () => getBalance(walletId) });
+  const { data: historyData, isLoading: isHistoryLoading } = useQuery({ 
+    queryKey: ['history', walletId, page], 
+    queryFn: () => getHistory(walletId, limit, page * limit),
+    placeholderData: keepPreviousData
+  });
 
   useEffect(() => {
     if (successModal.visible) {
@@ -693,6 +682,10 @@ export default function WalletDetails() {
   const transactions = (historyData?.transactions as TransactionData[]) || [];
   const totalPages = Math.ceil((historyData?.total || 0) / limit);
   const isPending = creditMutation.isPending || debitMutation.isPending;
+
+  if (isBalanceLoading || isHistoryLoading) {
+    return <PageLoader />;
+  }
 
   return (
     <Page>
