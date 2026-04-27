@@ -144,7 +144,7 @@ const ActionPane = styled.div`
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 48px 20px 24px 20px;
+  padding: 48px 20px 120px 20px;
   
   &::-webkit-scrollbar { display: none; }
   -ms-overflow-style: none;
@@ -538,7 +538,6 @@ const Pagination = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto; /* Push to bottom of LedgerPane */
   padding-top: 24px;
 `;
 const PageBtn = styled.button`
@@ -630,6 +629,7 @@ export default function WalletDetails() {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
       queryClient.invalidateQueries({ queryKey: ['wallets'] }); // refresh home page portfolio
+      queryClient.invalidateQueries({ queryKey: ['all-activity'] }); // Update activity feed
       setSuccessModal({ visible: true, message: `Successfully added ₹${amountInput}` });
       resetForm();
     },
@@ -642,6 +642,7 @@ export default function WalletDetails() {
       queryClient.invalidateQueries({ queryKey: ['balance', walletId] });
       queryClient.invalidateQueries({ queryKey: ['history', walletId] });
       queryClient.invalidateQueries({ queryKey: ['wallets'] }); // refresh home page portfolio
+      queryClient.invalidateQueries({ queryKey: ['all-activity'] }); // Update activity feed
       setSuccessModal({ visible: true, message: `Successfully withdrawn ₹${amountInput}` });
       resetForm();
     },
@@ -673,6 +674,7 @@ export default function WalletDetails() {
       if (result.success) { 
         toast.success('Wallet deleted'); 
         queryClient.invalidateQueries({ queryKey: ['wallets'] });
+        queryClient.invalidateQueries({ queryKey: ['all-activity'] }); // Update activity feed
         window.location.href = '/'; 
       }
       else { toast.error(result.error); setIsDeleting(false); }
@@ -683,6 +685,19 @@ export default function WalletDetails() {
     if (viewMode === 'choice' || isDesktop) router.push('/');
     else setViewMode('choice');
   };
+
+  // Scroll to bottom when page changes or history is opened
+  useEffect(() => {
+    if (viewMode === 'history' || isDesktop) {
+      // Small timeout to allow content to render
+      setTimeout(() => {
+        const containers = document.querySelectorAll('[data-scroll-container="true"]');
+        containers.forEach(container => {
+          container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        });
+      }, 100);
+    }
+  }, [page, viewMode, isDesktop]);
 
   const currentBalance = balanceData?.balance || 0;
   const transactions = (historyData?.transactions as TransactionData[]) || [];
@@ -712,7 +727,7 @@ export default function WalletDetails() {
 
       <MainContent>
         <WorkspaceGrid>
-          <ActionPane>
+          <ActionPane data-scroll-container="true">
             <HeaderSection>
               <HeaderRow>
                 <BackBtn whileHover={{ x: -4 }} onClick={handleBack}><ChevronLeft size={18} />{isDesktop ? 'Dashboard' : (viewMode === 'choice' ? 'Dashboard' : 'Options')}</BackBtn>
@@ -779,7 +794,7 @@ export default function WalletDetails() {
                 )}
 
                 {viewMode === 'history' && (
-                  <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: '40px' }}>
                     <HistoryHeader><HistoryTitle>Ledger</HistoryTitle></HistoryHeader>
                     <LedgerBox>
                       {transactions.length === 0 ? (
@@ -824,7 +839,7 @@ export default function WalletDetails() {
             </ActionHub>
           </ActionPane>
 
-          <LedgerPane>
+          <LedgerPane data-scroll-container="true">
             <HistoryHeader><HistoryTitle>Live Ledger</HistoryTitle></HistoryHeader>
             <LedgerBox>
               {transactions.length === 0 ? (
