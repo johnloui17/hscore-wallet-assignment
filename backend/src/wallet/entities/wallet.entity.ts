@@ -13,7 +13,7 @@ export class Wallet {
   balance: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @OneToMany(() => Transaction, (transaction) => transaction.wallet)
   transactions: Transaction[];

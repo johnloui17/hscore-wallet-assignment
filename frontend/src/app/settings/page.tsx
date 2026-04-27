@@ -3,19 +3,19 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
-import { 
-  User, 
-  Shield, 
-  Settings as SettingsIcon, 
-  CreditCard, 
-  ChevronRight, 
-  Bell, 
-  Fingerprint, 
-  Moon, 
-  IndianRupee, 
-  BarChart3, 
-  Download, 
-  Crown, 
+import {
+  User,
+  Shield,
+  Settings as SettingsIcon,
+  CreditCard,
+  ChevronRight,
+  Bell,
+  Fingerprint,
+  Moon,
+  IndianRupee,
+  BarChart3,
+  Download,
+  Crown,
   LogOut,
   Home,
   Activity as ActivityIcon,
@@ -411,7 +411,7 @@ export default function SettingsPage() {
     {
       title: 'Account & Security',
       items: [
-        { icon: <User size={20} />, label: 'Profile Details', sub: 'John Doe • Platinum member', color: '#3b82f6' },
+        { icon: <User size={20} />, label: 'Profile Details', sub: 'Ronaldo KK • Platinum member', color: '#3b82f6' },
         { icon: <Shield size={20} />, label: 'Privacy & Permissions', sub: 'Biometric unlock active', color: '#10b981' },
         { icon: <Fingerprint size={20} />, label: 'Face ID & Passcode', sub: 'Manage security keys', color: '#6366f1' },
       ]
@@ -488,7 +488,7 @@ export default function SettingsPage() {
               </SettingsSection>
             ))}
 
-            <SettingItem 
+            <SettingItem
               style={{ marginTop: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.1)' }}
               whileTap={{ scale: 0.98 }}
             >

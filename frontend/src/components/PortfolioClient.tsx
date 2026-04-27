@@ -29,7 +29,7 @@ interface WalletData {
   id: string;
   name: string;
   balance: number | string;
-  createdAt: string;
+  created_at: string;
   transactions?: TransactionShort[];
 }
 
@@ -229,7 +229,6 @@ const ScrollArea = styled.div`
   }
 `;
 
-/* ── Header ── */
 const HeaderSection = styled.div`
   display: flex;
   flex-direction: column;
@@ -305,7 +304,6 @@ const StatusValue = styled.div`
   }
 `;
 
-/* ── Desktop Hero Section ── */
 const DesktopHero = styled.div`
   display: none;
 
@@ -390,7 +388,6 @@ const EmptyChartIcon = styled.div`
   margin-top: 20px;
 `;
 
-/* ── Summary Card ── */
 const SummaryCardContainer = styled.div`
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 24px;
@@ -469,7 +466,6 @@ const SectionTitle = styled.h2`
   }
 `;
 
-/* ── Wallet Card (Vertical on Mobile, Grid on Desktop) ── */
 const WalletList = styled.div`
   display: flex;
   flex-direction: column;
@@ -592,7 +588,6 @@ const PlanIndicator = styled.div<{ $color: string }>`
   }
 `;
 
-/* ── Empty State ── */
 const EmptyState = styled.div`
   text-align: center;
   padding: 48px 20px;
@@ -605,7 +600,6 @@ const EmptyState = styled.div`
   }
 `;
 
-/* ── Footer ── */
 const Footer = styled.nav`
   width: 100%;
   padding: 8px 12px 12px 12px;
@@ -672,19 +666,16 @@ const AddButton = styled(motion.button)`
   }
 `;
 
-/* ── Helpers ── */
 const ACCENT_COLORS = ['#3b82f6', '#94a3b8', '#f59e0b', '#10b981', '#6366f1'];
-const PLAN_NAMES = ['Starter', 'Silver', 'Gold', 'Platinum', 'Black Edition'];
 
 function getAccentColor(index: number) {
   return ACCENT_COLORS[index % ACCENT_COLORS.length];
 }
 
-function getPlanName(index: number) {
-  return PLAN_NAMES[index % PLAN_NAMES.length];
+function getPlanName() {
+  return 'Platinum Member';
 }
 
-/* ── Mobile/Desktop wrappers ── */
 const DesktopOnly = styled.div`
   display: none;
   @media (min-width: 1024px) {
@@ -699,7 +690,6 @@ const MobileOnly = styled.div`
   }
 `;
 
-/* ── Main Component ── */
 export function PortfolioClient({ wallets }: PortfolioClientProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const router = useRouter();
@@ -708,10 +698,8 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
 
   const totalValue = wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0);
 
-  // Detect when a new wallet is added
   useEffect(() => {
     if (wallets.length > prevWalletsCount.current) {
-      // Only auto-scroll on desktop
       if (window.innerWidth >= 1024 && newestCardRef.current) {
         setTimeout(() => {
           newestCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -723,13 +711,11 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
 
   return (
     <Page>
-      {/* ── Desktop Sidebar ── */}
       <Sidebar>
         <SidebarBrand>
           <VaultLogo size={32} />
           <BrandName>Pocket Feel</BrandName>
         </SidebarBrand>
-
         <SidebarNav>
           <SidebarItem onClick={() => router.push('/')} $active>
             <Home size={20} />
@@ -748,7 +734,6 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
             Settings
           </SidebarItem>
         </SidebarNav>
-
         <div style={{ marginTop: 'auto' }}>
           <AddButton
             whileHover={{ scale: 1.02 }}
@@ -763,7 +748,6 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
 
       <MainContent>
         <ScrollArea>
-          {/* ── Header ── */}
           <HeaderSection>
             <LogoTitleRow>
               <VaultLogo size={36} />
@@ -800,7 +784,6 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
             </DesktopStatus>
           </HeaderSection>
 
-          {/* ── Section 1: Analytics (Desktop Hero) ── */}
           <DesktopHero>
             <SummaryCardContainer>
               <SummaryLabel>Total Net Worth</SummaryLabel>
@@ -830,7 +813,6 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
             </ChartContainer>
           </DesktopHero>
 
-          {/* ── Mobile-only Summary ── */}
           <MobileOnly style={{ marginBottom: '32px' }}>
             <SummaryCardContainer>
               <SummaryLabel>Total Balance</SummaryLabel>
@@ -848,7 +830,6 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
             </SummaryCardContainer>
           </MobileOnly>
 
-          {/* ── Section 2: Wallets List ── */}
           <div>
             <SectionHeader>
               <SectionTitle>My Wallets</SectionTitle>
@@ -896,7 +877,7 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
                       </CardBalance>
                       <CardBottom>
                         <PlanIndicator $color={getAccentColor(index)}>
-                          {getPlanName(index)} Tier
+                          {getPlanName()}
                         </PlanIndicator>
                       </CardBottom>
                     </div>
@@ -907,19 +888,16 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
           </div>
         </ScrollArea>
 
-        {/* ── Mobile Footer Navigation ── */}
         <MobileOnly>
           <Footer>
             <FooterItem onClick={() => router.push('/')} $active>
               <Home size={20} />
               <FooterLabel>Home</FooterLabel>
             </FooterItem>
-
             <FooterItem onClick={() => router.push('/activity')}>
               <Activity size={20} />
               <FooterLabel>Activity</FooterLabel>
             </FooterItem>
-
             <AddButton
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
@@ -927,12 +905,10 @@ export function PortfolioClient({ wallets }: PortfolioClientProps) {
             >
               <Plus size={28} strokeWidth={2.5} />
             </AddButton>
-
             <FooterItem onClick={() => router.push('/cards')}>
               <CreditCard size={20} />
               <FooterLabel>Cards</FooterLabel>
             </FooterItem>
-
             <FooterItem onClick={() => router.push('/settings')}>
               <Settings size={20} />
               <FooterLabel>Settings</FooterLabel>

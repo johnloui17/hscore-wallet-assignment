@@ -46,7 +46,7 @@ export class WalletService {
     return this.walletRepository.find({
       relations: ['transactions'],
       order: { 
-        createdAt: 'DESC',
+        created_at: 'DESC',
         transactions: { created_at: 'DESC' }
       },
     }).then(wallets => {
