@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { getBalance, credit, debit, getHistory } from '@/lib/api';
 import { useRouter, useParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { PageLoader, VaultLogo } from '@/components/PageLoader';
 import {
   ChevronLeft,
@@ -504,6 +504,48 @@ const DeleteBtn = styled(motion.button)`
   display: flex; align-items: center; gap: 10px; cursor: pointer;
 `;
 
+const SliderTrack = styled.div`
+  width: 100%;
+  height: 64px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  overflow: hidden;
+  margin-top: 32px;
+`;
+
+const SliderLabel = styled(motion.span)`
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  pointer-events: none;
+`;
+
+const SliderHandle = styled(motion.div)`
+  width: 56px;
+  height: 56px;
+  background: #ef4444;
+  border-radius: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: grab;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  
+  &:active { cursor: grabbing; }
+`;
+
 /* ── Nav & Success UI ── */
 const Footer = styled.nav`
   position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px 12px 12px;
@@ -702,6 +744,19 @@ export default function WalletDetails() {
   const totalPages = Math.ceil((historyData?.total || 0) / limit);
   const isPending = creditMutation.isPending || debitMutation.isPending;
 
+  // Swipe Slider Logic
+  const x = useMotionValue(0);
+  const sliderOpacity = useTransform(x, [0, 150], [1, 0]);
+  const handleColor = useTransform(x, [0, 240], ['#ef4444', '#10b981']);
+
+  const onSwipeEnd = (_: any, info: any) => {
+    if (info.offset.x > 200) {
+      handleDelete();
+    } else {
+      x.set(0);
+    }
+  };
+
   if (isBalanceLoading || isHistoryLoading) {
     return <PageLoader />;
   }
@@ -893,16 +948,43 @@ export default function WalletDetails() {
                 <AlertCircle size={48} strokeWidth={2.5} />
               </div>
               <SuccessMessage>Delete Vault?</SuccessMessage>
-              <SuccessSubMessage>This will permanently remove <b>{balanceData?.name}</b> and all its transaction history. This action cannot be undone.</SuccessSubMessage>
+              <SuccessSubMessage>This will permanently remove <b>{balanceData?.name}</b> and all its transaction history.</SuccessSubMessage>
               
-              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '32px' }}>
-                <SubmitButton $type="credit" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }} onClick={() => setConfirmDelete(false)}>
-                  Cancel
-                </SubmitButton>
-                <SubmitButton $type="debit" onClick={handleDelete} disabled={isDeleting}>
-                  {isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete Vault'}
-                </SubmitButton>
-              </div>
+              <SliderTrack>
+                <SliderLabel style={{ opacity: sliderOpacity }}>
+                  Swipe to confirm
+                </SliderLabel>
+                <SliderHandle
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 280 }}
+                  dragElastic={0.1}
+                  onDragEnd={onSwipeEnd}
+                  style={{ x, backgroundColor: handleColor }}
+                >
+                  {isDeleting ? (
+                    <Loader2 className="animate-spin" size={24} />
+                  ) : (
+                    <Trash2 size={24} />
+                  )}
+                </SliderHandle>
+              </SliderTrack>
+
+              <button 
+                style={{ 
+                  marginTop: '24px',
+                  background: 'none',
+                  border: 'none',
+                  color: '#64748b',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}
+                onClick={() => setConfirmDelete(false)}
+              >
+                Cancel Action
+              </button>
             </ModalContent>
           </ModalOverlay>
         )}
