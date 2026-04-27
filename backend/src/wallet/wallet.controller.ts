@@ -48,6 +48,7 @@ export class WalletController {
 
   @Get('transactions/all')
   async getAllTransactions(
+    @Query('userId') userId: string,
     @Query('limit') limit = 10,
     @Query('offset') offset = 0,
     @Query('type') type?: string,
@@ -57,7 +58,6 @@ export class WalletController {
     @Query('sortBy') sortBy: 'date' | 'amount' = 'date',
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'DESC',
     @Query('walletId') walletId?: string | string[],
-    @Query('userId') userId: string,
   ) {
     if (!userId) {
       throw new BadRequestException('userId query parameter is required');
