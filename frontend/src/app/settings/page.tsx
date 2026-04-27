@@ -412,6 +412,12 @@ export default function SettingsPage() {
     setUserId(localStorage.getItem('pocketfeel_user_id'));
   }, []);
 
+  const handleSignOut = () => {
+    localStorage.removeItem('pocketfeel_user_id');
+    document.cookie = 'pocketfeel_user_id=; path=/; max-age=0; SameSite=Lax';
+    router.push('/login');
+  };
+
   const sections = [
     {
       title: 'Account & Security',
@@ -494,8 +500,9 @@ export default function SettingsPage() {
             ))}
 
             <SettingItem
-              style={{ marginTop: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.1)' }}
+              style={{ marginTop: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.1)', cursor: 'pointer' }}
               whileTap={{ scale: 0.98 }}
+              onClick={handleSignOut}
             >
               <ItemLeft>
                 <IconBox $color="#ef4444"><LogOut size={20} /></IconBox>
