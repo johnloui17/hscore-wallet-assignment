@@ -18,7 +18,7 @@ import {
 import { CreateWalletBottomSheet } from '@/components/CreateWalletBottomSheet';
 
 /* ── SVG Logo Component (Shared) ── */
-function VaultLogo({ size = 40 }: { size?: number }) {
+function WalletLogo({ size = 40 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -461,7 +461,7 @@ export default function CardsPage() {
     <Page>
       <Sidebar>
         <SidebarBrand>
-          <VaultLogo size={32} />
+          <WalletLogo size={32} />
           <BrandName>Pocket Feel</BrandName>
         </SidebarBrand>
         <SidebarNav>

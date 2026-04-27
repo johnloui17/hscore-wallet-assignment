@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { getBalance, credit, debit, getHistory } from '@/lib/api';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { PageLoader, VaultLogo } from '@/components/PageLoader';
+import { PageLoader, WalletLogo } from '@/components/PageLoader';
 import {
   ChevronLeft,
   ArrowUpCircle,
@@ -623,13 +623,13 @@ export default function WalletDetails() {
     { icon: <Plane size={20} />, name: 'Travel Cost' }, { icon: <Briefcase size={20} />, name: 'Salary' },
   ];
 
-  const { data: balanceData, isLoading: isBalanceLoading } = useQuery({ 
-    queryKey: ['balance', walletId], 
+  const { data: balanceData, isLoading: isBalanceLoading } = useQuery({
+    queryKey: ['balance', walletId],
     queryFn: () => getBalance(walletId),
-    enabled: !!walletId 
+    enabled: !!walletId
   });
-  const { data: historyData, isLoading: isHistoryLoading } = useQuery({ 
-    queryKey: ['history', walletId, page], 
+  const { data: historyData, isLoading: isHistoryLoading } = useQuery({
+    queryKey: ['history', walletId, page],
     queryFn: () => getHistory(walletId, limit, page * limit),
     placeholderData: keepPreviousData,
     enabled: !!walletId
@@ -711,11 +711,11 @@ export default function WalletDetails() {
     setIsDeleting(true);
     try {
       const result = await deleteWalletAction(walletId);
-      if (result.success) { 
-        toast.success('Wallet deleted'); 
+      if (result.success) {
+        toast.success('Wallet deleted');
         queryClient.invalidateQueries({ queryKey: ['wallets'] });
         queryClient.invalidateQueries({ queryKey: ['all-activity'] }); // Update activity feed
-        window.location.href = '/'; 
+        window.location.href = '/';
       }
       else { toast.error(result.error); setIsDeleting(false); }
     } catch { toast.error('Deletion failed'); setIsDeleting(false); }
@@ -767,7 +767,7 @@ export default function WalletDetails() {
   return (
     <Page>
       <Sidebar>
-        <SidebarBrand><VaultLogo size={32} /><BrandName>Pocket Feel</BrandName></SidebarBrand>
+        <SidebarBrand><WalletLogo size={32} /><BrandName>Pocket Feel</BrandName></SidebarBrand>
         <SidebarNav>
           <SidebarItem onClick={() => router.push('/')}><Home size={20} />Home</SidebarItem>
           <SidebarItem onClick={() => router.push('/activity')}><ActivityIcon size={20} />Activity</SidebarItem>
@@ -787,12 +787,8 @@ export default function WalletDetails() {
             <HeaderSection>
               <HeaderRow>
                 <BackBtn whileHover={{ x: -4 }} onClick={handleBack}><ChevronLeft size={18} />{isDesktop ? 'Dashboard' : (viewMode === 'choice' ? 'Dashboard' : 'Options')}</BackBtn>
-                <WalletTitle>{balanceData?.name || 'Vault Details'}</WalletTitle>
+                <WalletTitle>{balanceData?.name || 'Wallet Details'}</WalletTitle>
               </HeaderRow>
-              <DesktopStatus>
-                <StatusItem><StatusLabel>Identity</StatusLabel><StatusValue><ShieldCheck size={14} />Verified</StatusValue></StatusItem>
-                <StatusItem><StatusLabel>Network</StatusLabel><StatusValue><RefreshCw size={14} />System Live</StatusValue></StatusItem>
-              </DesktopStatus>
             </HeaderSection>
 
             <BalanceCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -940,19 +936,19 @@ export default function WalletDetails() {
       <AnimatePresence>
         {confirmDelete && (
           <ModalOverlay initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setConfirmDelete(false)}>
-            <ModalContent 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }} 
-              animate={{ scale: 1, opacity: 1, y: 0 }} 
-              exit={{ scale: 0.9, opacity: 0, y: 20 }} 
+            <ModalContent
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
             >
               <div style={{ width: '80px', height: '80px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#ef4444', marginBottom: '24px' }}>
                 <AlertCircle size={48} strokeWidth={2.5} />
               </div>
-              <SuccessMessage>Delete Vault?</SuccessMessage>
+              <SuccessMessage>Delete Wallet?</SuccessMessage>
               <SuccessSubMessage>This will permanently remove <b>{balanceData?.name}</b> and all its transaction history.</SuccessSubMessage>
-              
+
               <SliderTrack ref={constraintsRef}>
                 <SliderLabel style={{ opacity: sliderOpacity }}>
                   Swipe to confirm
@@ -972,8 +968,8 @@ export default function WalletDetails() {
                 </SliderHandle>
               </SliderTrack>
 
-              <button 
-                style={{ 
+              <button
+                style={{
                   marginTop: '24px',
                   background: 'none',
                   border: 'none',

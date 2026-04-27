@@ -14,7 +14,7 @@ This checklist tracks the requirements specified in the hScore Advisors LLC assi
 - [x] **Authentication:** No auth required on API layer; querying uses `walletId` (and `userId` for scoping).
 
 ### Frontend Requirements (Next.js)
-- [x] **Create Wallet:** User can create multiple vaults with initial deposits.
+- [x] **Create Wallet:** User can create multiple wallets with initial deposits.
 - [x] **View Details:** Real-time balance and transaction summaries.
 - [x] **Credit/Debit:** Dedicated flows for managing funds.
 - [x] **Paginated History:** Clean ledger view with pagination support.

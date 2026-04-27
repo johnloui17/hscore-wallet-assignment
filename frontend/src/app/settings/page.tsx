@@ -28,7 +28,7 @@ import { motion } from 'framer-motion';
 import { CreateWalletBottomSheet } from '@/components/CreateWalletBottomSheet';
 
 /* ── SVG Logo Component (Shared) ── */
-function VaultLogo({ size = 40 }: { size?: number }) {
+function WalletLogo({ size = 40 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -404,10 +404,77 @@ const MobileOnly = styled.div`
   }
 `;
 
+const ModalOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 17, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  z-index: 2000;
+`;
+
+const ModalCard = styled(motion.div)`
+  width: 100%;
+  max-width: 400px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.5);
+`;
+
+const ModalIcon = styled.div`
+  width: 64px;
+  height: 64px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 24px auto;
+`;
+
+const ModalTitle = styled.h3`
+  font-size: 1.5rem;
+  color: white;
+  font-weight: 800;
+  margin-bottom: 8px;
+`;
+
+const ModalText = styled.p`
+  color: #94a3b8;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 32px;
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  gap: 12px;
+`;
+
+const ModalButton = styled(motion.button)<{ $primary?: boolean }>`
+  flex: 1;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: ${props => props.$primary ? '#ef4444' : 'rgba(255, 255, 255, 0.05)'};
+  color: ${props => props.$primary ? 'white' : '#f1f5f9'};
+`;
+
 export default function SettingsPage() {
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     setUserId(localStorage.getItem('pocketfeel_user_id'));
@@ -451,7 +518,7 @@ export default function SettingsPage() {
     <Page>
       <Sidebar>
         <SidebarBrand>
-          <VaultLogo size={32} />
+          <WalletLogo size={32} />
           <BrandName>Pocket Feel</BrandName>
         </SidebarBrand>
         <SidebarNav>
@@ -504,7 +571,7 @@ export default function SettingsPage() {
             <SettingItem
               style={{ marginTop: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.1)', cursor: 'pointer' }}
               whileTap={{ scale: 0.98 }}
-              onClick={handleSignOut}
+              onClick={() => setShowLogoutConfirm(true)}
             >
               <ItemLeft>
                 <IconBox $color="#ef4444"><LogOut size={20} /></IconBox>
@@ -524,6 +591,37 @@ export default function SettingsPage() {
           </Footer>
         </MobileOnly>
       </MainContent>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <ModalOverlay
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          <ModalCard
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ModalIcon>
+              <LogOut size={32} />
+            </ModalIcon>
+            <ModalTitle>Sign Out</ModalTitle>
+            <ModalText>Are you sure you want to sign out of your account?</ModalText>
+            <ModalActions>
+              <ModalButton onClick={() => setShowLogoutConfirm(false)}>
+                Cancel
+              </ModalButton>
+              <ModalButton $primary onClick={handleSignOut}>
+                Sign Out
+              </ModalButton>
+            </ModalActions>
+          </ModalCard>
+        </ModalOverlay>
+      )}
+
       <CreateWalletBottomSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
     </Page>
   );

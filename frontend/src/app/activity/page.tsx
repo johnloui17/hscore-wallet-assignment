@@ -6,7 +6,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getAllActivity, getAllWallets } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PageLoader, VaultLogo } from '@/components/PageLoader';
+import { PageLoader, WalletLogo } from '@/components/PageLoader';
 import { 
   TrendingUp, 
   TrendingDown,
@@ -627,7 +627,7 @@ export default function ActivityPage() {
     return (
       <Page>
         <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '24px', color: 'white', textAlign: 'center', padding: '24px' }}>
-          <VaultLogo size={64} />
+          <WalletLogo size={64} />
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Failed to load activity</h2>
             <p style={{ color: '#94a3b8' }}>Please check your connection and try again.</p>
@@ -642,7 +642,7 @@ export default function ActivityPage() {
     <Page>
       <Sidebar>
         <SidebarBrand>
-          <VaultLogo size={32} />
+          <WalletLogo size={32} />
           <BrandName>Pocket Feel</BrandName>
         </SidebarBrand>
         <SidebarNav>
@@ -663,7 +663,7 @@ export default function ActivityPage() {
           <HeaderRow>
             <div>
               <PageTitle>Global Activity</PageTitle>
-              <DesktopOnly><p style={{ color: '#64748b', fontSize: '1.1rem', fontWeight: 500, marginTop: '8px' }}>Real-time audit log of all your vaults.</p></DesktopOnly>
+              <DesktopOnly><p style={{ color: '#64748b', fontSize: '1.1rem', fontWeight: 500, marginTop: '8px' }}>Real-time audit log of all your wallets.</p></DesktopOnly>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
               <DesktopStatus>

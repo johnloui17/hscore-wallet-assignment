@@ -18,23 +18,23 @@ Since the application is built on the Next.js App Router, we will pivot from pur
 ## 2. Dashboard (Home Page)
 
 ### Current Flow & State
-- **Flow**: User lands on the dashboard -> Views a responsive desktop-style grid of wallet cards -> Clicks "Create Vault" to open a standard modal.
+- **Flow**: User lands on the dashboard -> Views a responsive desktop-style grid of wallet cards -> Clicks "Create Wallet" to open a standard modal.
 - **UI**: Glassmorphism cards, grid layout that breaks to a single column on mobile, top-aligned action buttons.
 
 ### Proposed Mobile-First Flow & State
-- **Flow**: User lands on dashboard -> Views a global "Total Assets" summary prominently at the top -> Swipes horizontally through a carousel of wallet cards -> Uses a fixed bottom-right Floating Action Button (FAB) or a sticky bottom action bar to create a new vault.
+- **Flow**: User lands on dashboard -> Views a global "Total Assets" summary prominently at the top -> Swipes horizontally through a carousel of wallet cards -> Uses a fixed bottom-right Floating Action Button (FAB) or a sticky bottom action bar to create a new wallet.
 - **UI Updates**:
-  - **Global Summary**: Introduce a prominent, sticky "Total Net Worth" header at the top that sums up balances across all vaults.
-  - **Wallet Carousel**: Instead of a vertical list or grid, present vaults as a horizontal snapping carousel of high-fidelity cards. This maximizes vertical screen real estate.
-  - **Action Placement**: Move the "Create Vault" action to a large FAB (Floating Action Button) anchored to the bottom right of the screen, or a persistent bottom action bar. This makes it easily reachable with the thumb.
-  - **Empty State**: Interactive, full-width SVG illustration taking up the center of the screen, with an animated CTA button pushing the user to create their first vault.
+  - **Global Summary**: Introduce a prominent, sticky "Total Net Worth" header at the top that sums up balances across all wallets.
+  - **Wallet Carousel**: Instead of a vertical list or grid, present wallets as a horizontal snapping carousel of high-fidelity cards. This maximizes vertical screen real estate.
+  - **Action Placement**: Move the "Create Wallet" action to a large FAB (Floating Action Button) anchored to the bottom right of the screen, or a persistent bottom action bar. This makes it easily reachable with the thumb.
+  - **Empty State**: Interactive, full-width SVG illustration taking up the center of the screen, with an animated CTA button pushing the user to create their first wallet.
 
 ---
 
-## 3. "Create Vault" Flow
+## 3. "Create Wallet" Flow
 
 ### Current Flow & State
-- **Flow**: Click "Create Vault" -> Standard centered modal overlay appears -> User enters Name and Initial Deposit -> Submits.
+- **Flow**: Click "Create Wallet" -> Standard centered modal overlay appears -> User enters Name and Initial Deposit -> Submits.
 - **UI**: Standard dark modal, which often feels cramped on small screens and pushes the keyboard awkwardly.
 
 ### Proposed Mobile-First Flow & State
@@ -58,7 +58,7 @@ Since the application is built on the Next.js App Router, we will pivot from pur
   - **Sticky Bottom Actions**: Pin large `[ + Add Funds ]` and `[ - Withdraw ]` buttons to the bottom edge of the screen. They remain visible regardless of how far down the user scrolls through the history.
   - **Transaction Bottom Sheet**: Tapping Credit/Debit pulls up a quick-action bottom sheet. It features a large, custom numeric keypad and a horizontal scrollable row of categories.
   - **Seamless Ledger**: The history is not hidden. The lower section of the page is a dedicated, infinite-scrolling list of transactions.
-  - **Swipe Actions**: Introduce swipe-to-delete or swipe-to-edit gestures on transaction rows (if applicable) or on the vault card itself from the dashboard.
+  - **Swipe Actions**: Introduce swipe-to-delete or swipe-to-edit gestures on transaction rows (if applicable) or on the wallet card itself from the dashboard.
 
 ---
 

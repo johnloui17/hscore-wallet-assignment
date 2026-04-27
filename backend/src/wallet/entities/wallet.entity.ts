@@ -6,7 +6,7 @@ export class Wallet {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', default: 'My Vault' })
+  @Column({ type: 'varchar', default: 'My Wallet' })
   name: string;
 
   @Column({ type: 'varchar', nullable: true })

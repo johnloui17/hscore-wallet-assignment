@@ -26,11 +26,11 @@ This document outlines the step-by-step execution phases to transform the `@fron
    - Build the sticky "Total Portfolio Value" header.
    - Implement the `<WalletCarousel />` for swipeable wallet cards.
    - Implement the bottom-right FAB (Floating Action Button).
-   - Build and attach the `<CreateWalletBottomSheet />` for smooth vault creation.
+   - Build and attach the `<CreateWalletBottomSheet />` for smooth wallet creation.
 
 > [!CAUTION]
 > **🛑 REVIEW GATE 1: Home Page Review**
-> At this point, execution will pause. I will present the new Home Page and Create Vault flow to you. Once you approve the design and functionality, we will proceed to Phase 2.
+> At this point, execution will pause. I will present the new Home Page and Create Wallet flow to you. Once you approve the design and functionality, we will proceed to Phase 2.
 
 ---
 

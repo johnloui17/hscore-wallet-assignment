@@ -1,56 +1,56 @@
-# Pocket Feel - Your Personal Digital Wallet
-Pocket Feel is a modern, high-integrity full-stack digital wallet application. It provides a secure and intuitive interface for managing multiple wallets, tracking balances, and categorizing transactions.
+# 💳 Pocket Feel — High-Integrity Digital Wallet
+
+Pocket Feel is a modern, full-stack digital wallet application designed for secure, user-scoped transaction management. It features a high-fidelity frontend built with **Next.js 15** and a robust **NestJS** backend, ensuring ACID-compliant operations and a premium user experience.
+
 ![Pocket Feel Dashboard](./assets/homePage.png)
 
+---
 
-## 🚀 Key Functionalities
+## ✨ Key Features
 
-### 1. Multi-Wallet Management
-- **Create Wallets:** Setup multiple distinct vaults (e.g., "Savings", "Daily Expenses", "Travel Fund").
-- **Initial Deposits:** Start any vault with an initial balance.
-- **Dynamic List:** Real-time view of all your vaults and their current totals.
-- **Secure Deletion:** Remove vaults that are no longer needed.
+### 🔐 User-ID Scoped Sessions
+- **Zero-Password Entry:** Users access their wallets using a simple User ID (e.g., `ronaldo`).
+- **Secure Persistence:** Sessions are maintained via `HttpOnly` cookies and `localStorage`, ensuring data isolation without complex OAuth setups.
+- **Cross-Device Ready:** All data is associated with the User ID in the database, allowing access from any browser.
 
-### 2. Transaction Integrity
-- **Credit (Deposit):** Add funds to any wallet instantly.
-- **Debit (Withdrawal):** Securely withdraw funds with automatic balance validation to prevent overdrafts.
-- **ACID Compliance:** The backend ensures that balance updates and transaction logging happen atomically using TypeORM transactions.
+### 🛡️ Transaction Integrity
+- **ACID Compliance:** Uses TypeORM transactions to ensure balance updates and ledger entries happen atomically—no partial state even on failures.
+- **Safe Deletion:** A custom **"Safe Swipe Slider"** prevents accidental wallet deletion, requiring a deliberate drag interaction to confirm.
+- **Overdraft Protection:** Backend validation prevents debit operations that exceed the available balance.
 
-### 3. Categorization & Tracking
-- **Smart Categories:** Assign categories like *Groceries*, *Bills*, *Dining*, *Salary*, and more to your transactions.
-- **Visual Icons:** Transaction history displays intuitive emojis for quick visual identification.
-- **Detailed History:** View a complete ledger of every credit and debit ever made.
-- **Pagination:** Clean, paginated history view (4 transactions per page) for efficient browsing.
+### 📊 Real-Time Financial Tracking
+- **Paginated Ledger:** Efficiently browse through transaction history with server-side pagination.
+- **Smart Categorization:** Tag transactions with categories like *Groceries*, *Dining*, or *Salary* for better tracking.
+- **Live Updates:** Integrated with **TanStack Query** for instant UI synchronization after every transaction.
 
 ---
 
-## 🎨 Frontend Flow & User Session
+## 🏗️ Technical Architecture
 
-Pocket Feel implements a streamlined "User ID Session" as per the assignment requirements, avoiding complex password-based authentication while ensuring data persistence.
+### **Frontend**
+- **Framework:** Next.js 15 (App Router)
+- **State & Fetching:** TanStack Query (React Query)
+- **Styling:** Styled Components + Framer Motion (Animations)
+- **Middleware:** Custom Edge Proxy for route protection and session verification.
 
-1.  **Entry:** Upon first visit, the user is redirected to the `/login` page.
-2.  **Session Initiation:** Users enter a simple **User ID** (e.g., "john"). This ID is stored in a secure `HttpOnly` cookie and `localStorage`.
-3.  **Persistence:** The application uses this ID to scope all wallet operations. The session is preserved across page refreshes and browser restarts until the user explicitly logs out.
-4.  **Data Isolation:** The backend uses the `userId` to ensure users only see and manage their own vaults.
-5.  **Logout:** Signing out clears the stored session tokens and redirects the user back to the login screen.
-
----
-
-## 🛠 Tech Stack
-
-- **Frontend:** Next.js 15, React 19, Styled Components, TanStack Query.
-- **Backend:** NestJS, TypeORM, class-validator.
-- **Database:** PostgreSQL (Primary) / SQLite (Development Toggle).
-- **Infrastructure:** Docker Compose for containerized PostgreSQL orchestration.
+### **Backend**
+- **Framework:** NestJS (TypeScript)
+- **Database:** PostgreSQL (Production) / SQLite (Local Dev fallback)
+- **ORM:** TypeORM
+- **Validation:** `class-validator` for DTO-level request integrity.
 
 ---
 
-## 🚦 Getting Started & Environment Setup
+## 🚦 Getting Started
 
-### 1. Environment Variables (`.env`)
+### 1. Prerequisites
+- Node.js (v18+)
+- Docker (Optional, for PostgreSQL)
 
-#### Backend (`backend/.env`)
-Create a `.env` file in the `backend/` directory with the following:
+### 2. Clone & Setup Environments
+
+#### **Backend (`/backend`)**
+Create a `.env` file:
 ```env
 PORT=3001
 DB_TYPE=postgres
@@ -60,83 +60,56 @@ DB_USERNAME=postgres
 DB_PASSWORD=postgres
 DB_NAME=hscore_wallet
 ```
+*Note: To use SQLite instead, simply run with `DB_TYPE=sqlite`.*
 
-#### Frontend (`frontend/.env.local`)
-Create a `.env.local` file in the `frontend/` directory:
+#### **Frontend (`/frontend`)**
+Create a `.env.local` file:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1/wallet
 ```
 
-### 2. Database Setup (PostgreSQL)
-The project defaults to PostgreSQL. The recommended way to run it is via **Docker**:
+### 3. Execution
+**Start Database:**
 ```bash
 docker compose up -d
 ```
-*Alternatively, you can use local PostgreSQL via Homebrew (`brew services start postgresql@15`).*
 
-### 3. Run Backend
+**Launch Services:**
 ```bash
-cd backend
-npm install
-npm run start:dev
-```
+# In /backend
+npm install && npm run start:dev
 
-### 4. Run Frontend
-```bash
-cd frontend
-npm install
-npm run dev
+# In /frontend
+npm install && npm run dev
 ```
 
 ---
 
-## 🔄 Database Toggle & Migrations
+## 🌐 Deployment Instructions
 
-### Local SQLite Development
-If you prefer not to use PostgreSQL/Docker, you can switch to **SQLite** instantly:
-```bash
-cd backend && DB_TYPE=sqlite npm run start:dev
-```
-This will create a local `database.sqlite` file.
+### **Backend (e.g., Render / Railway)**
+1.  Connect your repository.
+2.  Set the Root Directory to `backend/`.
+3.  Add all environment variables listed above.
+4.  Build Command: `npm install && npm run build`.
+5.  Start Command: `npm run start:prod`.
 
-### Schema Synchronization
-The application uses TypeORM's `synchronize: true` in development mode to automatically handle schema updates and migrations based on the TypeScript entities. For production, this is disabled to ensure data safety.
-
----
-
-## 🌐 Production & Live Hosting
-When deploying this project to the internet (e.g., Vercel, Render, Railway), configure the following environment variables in your hosting provider:
-
-| Variable | Description | Example |
-| :--- | :--- | :--- |
-| `DB_TYPE` | Database Type | `postgres` |
-| `DB_HOST` | Database Hostname | `your-db-instance.amazonaws.com` |
-| `DB_PORT` | Database Port | `5432` |
-| `DB_USERNAME` | Database User | `admin` |
-| `DB_PASSWORD` | Database Password | `your-secure-password` |
-| `DB_NAME` | Database Name | `wallet_prod` |
-| `NODE_ENV` | Environment Mode | `production` |
-
-*Note: In production mode, `synchronize` is automatically disabled to protect your data schema.*
+### **Frontend (e.g., Vercel)**
+1.  Connect your repository.
+2.  Set the Root Directory to `frontend/`.
+3.  Set `NEXT_PUBLIC_API_URL` to your **Live Backend URL**.
+4.  Deploy.
 
 ---
 
-## 📘 API Reference (v1)
+## 📘 API & Documentation
 
-Pocket Feel provides a comprehensive RESTful API for managing wallets and transactions.
+Pocket Feel includes extensive internal documentation to assist reviewers:
 
-**[See Detailed API Documentation (API.md)](./API.md)**
-
-| Endpoint | Method | Parameters | Description |
-| :--- | :--- | :--- | :--- |
-| `/api/v1/wallet` | `GET` | `?userId={id}` | Fetch all wallets for a user |
-| `/api/v1/wallet` | `POST` | `userId`, `name`, `initialBalance` | Create a new wallet |
-| `/api/v1/wallet/:id` | `GET` | — | Get current balance |
-| `/api/v1/wallet/:id/credit` | `POST` | `amount`, `category`, `description` | Deposit funds |
-| `/api/v1/wallet/:id/debit` | `POST` | `amount`, `category`, `description` | Withdraw funds |
-| `/api/v1/wallet/:id/history` | `GET` | `?limit=10&offset=0` | Fetch paginated ledger |
-| `/api/v1/wallet/transactions/all` | `GET` | `?userId={id}` | Global activity feed |
+- **[Detailed API Documentation (API.md)](./API.md)** — Full endpoint signatures and examples.
+- **[Submission TODO Checklist (TODO.md)](./TODO.md)** — Tracking of assignment requirements.
+- **[Architectural Context (GEMINI.md)](./GEMINI.md)** — Deep dive into system-wide dependencies.
 
 ---
 
-*Developed by John Loui for HScore Wallet Assignment.*
+*Developed with ❤️ by John Loui for the hScore Advisors Wallet Assignment.*

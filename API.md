@@ -15,14 +15,14 @@ While the API does not require full authentication (JWT/OAuth), it enforces data
 ## 📁 Wallet Endpoints
 
 ### 1. Create Wallet
-Creates a new digital vault for a user.
+Creates a new digital wallet for a user.
 
 - **URL:** `/`
 - **Method:** `POST`
 - **Body:**
   ```json
   {
-    "name": "Savings Vault",
+    "name": "Savings Wallet",
     "initialBalance": 1000,
     "userId": "john_doe"
   }
@@ -33,7 +33,7 @@ Creates a new digital vault for a user.
     ```json
     {
       "id": "uuid-string",
-      "name": "Savings Vault",
+      "name": "Savings Wallet",
       "balance": 1000,
       "user_id": "john_doe",
       "created_at": "2026-04-27T12:00:00Z"

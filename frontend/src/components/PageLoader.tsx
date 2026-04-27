@@ -19,7 +19,7 @@ const LoadingOverlay = styled.div`
   gap: 16px;
 `;
 
-export function VaultLogo({ size = 40 }: { size?: number }) {
+export function WalletLogo({ size = 40 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -63,7 +63,7 @@ export function VaultLogo({ size = 40 }: { size?: number }) {
 export function PageLoader() {
   return (
     <LoadingOverlay>
-      <VaultLogo size={64} />
+      <WalletLogo size={64} />
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}

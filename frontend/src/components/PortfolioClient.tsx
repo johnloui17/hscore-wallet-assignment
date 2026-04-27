@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { getAllWallets } from '@/lib/api';
-import { PageLoader, VaultLogo } from './PageLoader';
+import { PageLoader, WalletLogo } from './PageLoader';
 import {
   Home,
   Activity,
@@ -710,9 +710,9 @@ export function PortfolioClient({ initialUserId }: PortfolioClientProps) {
           textAlign: 'center',
           padding: '24px'
         }}>
-          <VaultLogo size={64} />
+          <WalletLogo size={64} />
           <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Failed to load vaults</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Failed to load wallets</h2>
             <p style={{ color: '#94a3b8' }}>Please check your connection and try again.</p>
           </div>
           <button
@@ -738,7 +738,7 @@ export function PortfolioClient({ initialUserId }: PortfolioClientProps) {
     <Page>
       <Sidebar>
         <SidebarBrand>
-          <VaultLogo size={32} />
+          <WalletLogo size={32} />
           <BrandName>Pocket Feel</BrandName>
         </SidebarBrand>
         <SidebarNav>
@@ -775,7 +775,7 @@ export function PortfolioClient({ initialUserId }: PortfolioClientProps) {
         <ScrollArea>
           <HeaderSection>
             <LogoTitleRow>
-              <VaultLogo size={36} />
+              <WalletLogo size={36} />
               <BrandName>Pocket Feel</BrandName>
             </LogoTitleRow>
 
@@ -800,7 +800,7 @@ export function PortfolioClient({ initialUserId }: PortfolioClientProps) {
                 </StatusValue>
               </StatusItem>
               <StatusItem>
-                <StatusLabel>Total Vaults</StatusLabel>
+                <StatusLabel>Total Wallets</StatusLabel>
                 <StatusValue>
                   <LayoutGrid size={14} />
                   {wallets.length} Active

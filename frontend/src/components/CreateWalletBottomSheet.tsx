@@ -248,7 +248,7 @@ export function CreateWalletBottomSheet({ isOpen, onClose }: CreateWalletBottomS
             </SuccessIconWrapper>
 
             <SuccessTitle>Wallet Created!</SuccessTitle>
-            <SuccessSub>Your new vault <b>{name}</b> is ready for use.</SuccessSub>
+            <SuccessSub>Your new wallet <b>{name}</b> is ready for use.</SuccessSub>
 
             <SubmitButton
               style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }}
