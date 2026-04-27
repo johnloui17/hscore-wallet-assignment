@@ -504,13 +504,6 @@ const DeleteBtn = styled(motion.button)`
   display: flex; align-items: center; gap: 10px; cursor: pointer;
 `;
 
-const ConfirmDeleteBox = styled(motion.div)`
-  background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 24px; border-radius: 24px; width: 100%; display: flex; flex-direction: column; gap: 16px;
-  align-items: center; text-align: center;
-  @media (min-width: 1024px) { width: 400px; }
-`;
-
 /* ── Nav & Success UI ── */
 const Footer = styled.nav`
   position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px 12px 12px;
@@ -827,18 +820,7 @@ export default function WalletDetails() {
 
               {viewMode !== 'history' && (
                 <DeleteSection>
-                  {!confirmDelete ? (
-                    <DeleteBtn onClick={() => setConfirmDelete(true)} whileTap={{ scale: 0.95 }}><Trash2 size={18} />Delete Wallet</DeleteBtn>
-                  ) : (
-                    <ConfirmDeleteBox initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                      <AlertCircle size={32} color="#ef4444" />
-                      <div><h4 style={{ color: 'white', margin: '0 0 4px 0' }}>Are you sure?</h4><p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>This action cannot be undone.</p></div>
-                      <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
-                        <SubmitButton $type="credit" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }} onClick={() => setConfirmDelete(false)}>Cancel</SubmitButton>
-                        <SubmitButton $type="debit" onClick={handleDelete} disabled={isDeleting}>{isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete'}</SubmitButton>
-                      </div>
-                    </ConfirmDeleteBox>
-                  )}
+                  <DeleteBtn onClick={() => setConfirmDelete(true)} whileTap={{ scale: 0.95 }}><Trash2 size={18} />Delete Wallet</DeleteBtn>
                 </DeleteSection>
               )}
             </ActionHub>
@@ -892,6 +874,35 @@ export default function WalletDetails() {
               <div style={{ width: '80px', height: '80px', background: 'rgba(16, 185, 129, 0.15)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#10b981', marginBottom: '24px' }}><CheckCircle2 size={48} strokeWidth={2.5} /></div>
               <SuccessMessage>Transaction Successful</SuccessMessage><SuccessSubMessage>{successModal.message}</SuccessSubMessage>
               <motion.div initial={{ width: '100%' }} animate={{ width: 0 }} transition={{ duration: 5, ease: 'linear' }} style={{ height: '4px', background: '#10b981', borderRadius: '2px', marginTop: '24px', opacity: 0.6 }} />
+            </ModalContent>
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {confirmDelete && (
+          <ModalOverlay initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setConfirmDelete(false)}>
+            <ModalContent 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} 
+              animate={{ scale: 1, opacity: 1, y: 0 }} 
+              exit={{ scale: 0.9, opacity: 0, y: 20 }} 
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ width: '80px', height: '80px', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#ef4444', marginBottom: '24px' }}>
+                <AlertCircle size={48} strokeWidth={2.5} />
+              </div>
+              <SuccessMessage>Delete Vault?</SuccessMessage>
+              <SuccessSubMessage>This will permanently remove <b>{balanceData?.name}</b> and all its transaction history. This action cannot be undone.</SuccessSubMessage>
+              
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '32px' }}>
+                <SubmitButton $type="credit" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', boxShadow: 'none' }} onClick={() => setConfirmDelete(false)}>
+                  Cancel
+                </SubmitButton>
+                <SubmitButton $type="debit" onClick={handleDelete} disabled={isDeleting}>
+                  {isDeleting ? <Loader2 className="animate-spin" size={20} /> : 'Delete Vault'}
+                </SubmitButton>
+              </div>
             </ModalContent>
           </ModalOverlay>
         )}
