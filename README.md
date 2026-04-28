@@ -137,4 +137,4 @@ To assist with the review process, the following deep-dive docs are available:
 
 ---
 
-*Developed by John Loui.*
+*Developed by John Loui*

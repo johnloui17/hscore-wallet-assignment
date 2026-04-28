@@ -63,4 +63,4 @@ The Settings page manages user preferences and session termination.
 - **Next.js 15 (App Router)**: Orchestrates the overall page structure and routing.
 - **TanStack Query**: Manages all server-state, caching, and background synchronization.
 - **Styled Components**: Provides a unified, high-fidelity design system with responsive layouts.
-- **Framer Motion**: Handles all complex interactions, including the swipe-to-delete slider and page transitions.
+- **Framer Motion**: Handles all complex interactions, including the swipe-to-delete slider and page transitions
